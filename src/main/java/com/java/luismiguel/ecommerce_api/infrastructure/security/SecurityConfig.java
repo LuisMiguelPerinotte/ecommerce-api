@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.infrastructure.security.config;
+package com.java.luismiguel.ecommerce_api.infrastructure.security;
 
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtFilter;
 import jakarta.servlet.DispatcherType;
