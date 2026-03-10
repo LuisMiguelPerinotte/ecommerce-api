@@ -24,11 +24,16 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         String errorMessage = (String) request.getAttribute("exception");
-        HttpStatus
+        if (errorMessage == null) errorMessage = "Invalid Token or Expired";
+
+        Integer status = (Integer) request.getAttribute("status");
+        if (status == null) status = HttpServletResponse.SC_UNAUTHORIZED;
+
+        response.setStatus(status);
 
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put("timestamp", Instant.now().toString());
-        errorDetails.put("error", request.getAttribute("error"));
+        errorDetails.put("error", HttpStatus.valueOf(status));
         errorDetails.put("message", errorMessage);
         errorDetails.put("path", request.getRequestURI());
 
