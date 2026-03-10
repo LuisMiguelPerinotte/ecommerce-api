@@ -20,7 +20,7 @@ public class JwtService {
     private final JwtProperties jwtProperties;
     private final Algorithm algorithm;
 
-    public JwtService(JwtProperties jwtProperties, Algorithm algorithm) {
+    public JwtService(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.algorithm = Algorithm.HMAC256(jwtProperties.getSecret());;
     }
