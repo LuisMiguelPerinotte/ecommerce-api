@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_DB_USER}
+    password: ${POSTGRES_DB_PASSWORD}
+
+  jpa:
+    hibernate.ddl-auto: validate
+    show-sql: false
+
+  config:
+    import: optional:file:.env[.properties]
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
