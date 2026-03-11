@@ -20,7 +20,7 @@ public record RegisterRequestDTO(
         @NotBlank (message = "The Password is required!")
         @Size (min = 8, message = "The Password must be at least 8 characters long!")
         @Pattern(
-                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[@$!%*?&])[A-Za-z\\\\d@$!%*?&]+$",
+                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
                 message = "It must include uppercase, lowercase, numbers, and special characters."
         )
         String password
