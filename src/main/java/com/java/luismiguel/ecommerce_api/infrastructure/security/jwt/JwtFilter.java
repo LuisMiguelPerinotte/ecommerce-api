@@ -1,6 +1,7 @@
 package com.java.luismiguel.ecommerce_api.infrastructure.security.jwt;
 
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.UserNotFoundException;
+import com.java.luismiguel.ecommerce_api.application.auth.RefreshTokenService;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.auth.UserNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,10 +25,12 @@ import java.util.Optional;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final RefreshTokenService refreshTokenService;
 
-    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService, RefreshTokenService refreshTokenService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.refreshTokenService = refreshTokenService;
     }
 
 
@@ -43,6 +46,10 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authorizedHeader.substring(7);
 
             try {
+                if (refreshTokenService.isBlacklisted(token)){
+                    throw new BadCredentialsException("Invalid Token!");
+                }
+
                 Optional<JwtUserData> optUser = jwtService.validateToken(token);
                 if (optUser.isEmpty()){
                     throw new BadCredentialsException("Invalid Token!");
