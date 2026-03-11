@@ -36,6 +36,17 @@ public class JwtService {
                 .sign(algorithm);
     }
 
+
+    public String generateRefreshToken(User user) {
+        return JWT.create()
+                .withSubject(user.getEmail())
+                .withExpiresAt(Instant.now().plusMillis(jwtProperties.getRefreshExpiration()))
+                .withIssuedAt(Instant.now())
+                .withIssuer("ecommerce-api")
+                .sign(algorithm);
+    }
+
+
     public Optional<JwtUserData> validateToken(String token) {
         try {
             DecodedJWT decode = JWT.require(algorithm)
@@ -48,6 +59,23 @@ public class JwtService {
                     .email(decode.getSubject())
                     .userRole(UserRole.valueOf(decode.getClaim("role").asString()))
                     .build());
+
+        } catch (TokenExpiredException e) {
+            throw new CredentialsExpiredException("Expired Token!");
+
+        } catch (JWTVerificationException e) {
+            throw new BadCredentialsException("Invalid Token!");
+        }
+    }
+
+    public String validateRefreshToken(String refreshToken) {
+        try{
+            DecodedJWT decode = JWT.require(algorithm)
+                    .withIssuer("ecommerce-api")
+                    .build()
+                    .verify(refreshToken);
+
+            return decode.getSubject();
 
         } catch (TokenExpiredException e) {
             throw new CredentialsExpiredException("Expired Token!");
