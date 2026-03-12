@@ -1,6 +1,7 @@
 package com.java.luismiguel.ecommerce_api.infrastructure.exception;
 
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.auth.AuthException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,13 +26,24 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Object> handleAuthException(AuthException exception) {
+    public ResponseEntity<Object> handleAuthException(AuthException e) {
         HashMap<String, Object> body = errorBuilder(
-                exception.getStatus(),
-                exception.getStatus().name(),
-                exception.getMessage()
+                e.getStatus(),
+                e.getStatus().name(),
+                e.getMessage()
         );
-        return new ResponseEntity<>(body, exception.getStatus());
+        return new ResponseEntity<>(body, e.getStatus());
+    }
+
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Object> handleBusinessException(BusinessException e) {
+        HashMap<String, Object> body = errorBuilder(
+                e.getStatus(),
+                e.getStatus().name(),
+                e.getMessage()
+        );
+        return new ResponseEntity<>(body, e.getStatus());
     }
 
 
