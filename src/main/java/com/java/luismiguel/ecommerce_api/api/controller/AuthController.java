@@ -61,7 +61,7 @@ public class AuthController {
 
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
     @Operation(summary = "get logged user (GET)", description = "Retorna dados do usuário logado")
     public ResponseEntity<UserResponseDTO> getLoggedUser(@AuthenticationPrincipal User user) {
         return new ResponseEntity<>(authService.loggedUser(user), HttpStatus.OK);
@@ -69,7 +69,7 @@ public class AuthController {
 
 
     @PostMapping("/change-password")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
     @Operation(summary = "Change password (POST)", description = "Muda a senha (Precisa da senha Atual)")
     public ResponseEntity<Void> changeUserPassword(
             @Valid
@@ -82,6 +82,7 @@ public class AuthController {
 
 
     @PostMapping("/logout")
+    @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
     @Operation(summary = "User Logout (POST)", description = "Inválida o refresh token atual!")
     public ResponseEntity<Void> userLogout(
             @AuthenticationPrincipal User user,
