@@ -9,7 +9,7 @@ CREATE TABLE users(
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT chk_user_role CHECK (user_role IN ('CUSTOMER', 'ADMIN'))
+    CONSTRAINT chk_user_role CHECK (user_role IN ('ROLE_CUSTOMER', 'ROLE_ADMIN'))
 );
 
 --Update timestamp function -- Atualiza updated_at com a data atual sempre que table users for modificada.
