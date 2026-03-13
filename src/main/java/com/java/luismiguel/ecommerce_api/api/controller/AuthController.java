@@ -30,7 +30,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    @Operation(summary = "Register (POST)", description = "Valida os dados e registra um novo usuário no sistema.")
+    @Operation(summary = "register (POST)", description = "Valida os dados e registra um novo usuário no sistema.")
     public ResponseEntity<UserResponseDTO> registerUser(
             @Valid
             @RequestBody RegisterRequestDTO registerRequestDTO
@@ -40,7 +40,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @Operation(summary = "Login (POST)", description = "Realiza o login do usuário, valida as credenciais e gera um token JWT se a autenticação for bem-sucedida." )
+    @Operation(summary = "login (POST)", description = "Realiza o login do usuário, valida as credenciais e gera um token JWT se a autenticação for bem-sucedida." )
     public ResponseEntity<AuthResponseDTO> loginUser(
             @Valid
             @RequestBody LoginRequestDTO loginRequestDTO
@@ -70,7 +70,7 @@ public class AuthController {
 
     @PostMapping("/change-password")
     @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "Change password (POST)", description = "Muda a senha (Precisa da senha Atual)")
+    @Operation(summary = "change password (POST)", description = "Muda a senha (Precisa da senha Atual)")
     public ResponseEntity<Void> changeUserPassword(
             @Valid
             @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO,
@@ -83,7 +83,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "User Logout (POST)", description = "Inválida o refresh token atual!")
+    @Operation(summary = "user logout (POST)", description = "Inválida o refresh token atual!")
     public ResponseEntity<Void> userLogout(
             @AuthenticationPrincipal User user,
             HttpServletRequest request
