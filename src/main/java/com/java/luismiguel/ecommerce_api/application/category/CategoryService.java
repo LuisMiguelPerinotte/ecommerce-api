@@ -9,11 +9,11 @@ import com.java.luismiguel.ecommerce_api.domain.category.Category;
 import com.java.luismiguel.ecommerce_api.domain.category.CategoryRepository;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.CategoryAlreadyExistsException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.CategoryNotFoundException;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,16 +25,14 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<GetAllActiveCategoriesDTO> getAllCategories(Integer page, Integer size) {
-        List<Category> categories = categoryRepository.findAllByActiveTrue(PageRequest.of(page, size));
-
-        return categories.stream()
+    public Page<GetAllActiveCategoriesDTO> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAllByActiveTrue(pageable)
                 .map(category -> new GetAllActiveCategoriesDTO(
                         category.getCategoryId(),
                         category.getName(),
                         category.getSlug(),
                         category.getCreatedAt()
-                )).toList();
+                ));
     }
 
 
