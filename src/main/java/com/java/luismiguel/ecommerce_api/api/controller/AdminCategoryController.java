@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/categories")
-@Tag(name = "Admin Category", description = "Operações de admin nas Categorias.")
+@Tag(name = "Gerenciamento de Categorias do Administrador", description = "APIs para administradores gerenciarem categorias, incluindo criação, atualização e exclusão.")
 public class AdminCategoryController {
     private final CategoryService categoryService;
 
@@ -26,7 +26,7 @@ public class AdminCategoryController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "create category (POST)", description = "Cria uma categoria com as informações do request.")
+    @Operation(summary = "Criar Categoria", description = "Cria uma categoria com as informações do request.")
     public ResponseEntity<CreatedCategoryResponseDTO> createCategory(
             @Valid
             @RequestBody CreateCategoryRequestDTO createCategoryRequestDTO
@@ -37,7 +37,7 @@ public class AdminCategoryController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "update category (PATCH)", description = "edita uma categoria pelo id dado como parâmetro.")
+    @Operation(summary = "Atualizar Categoria", description = "edita uma categoria pelo id dado como parâmetro.")
     public ResponseEntity<Void> editCategory(
             @Valid
             @PathVariable UUID id,
@@ -50,7 +50,7 @@ public class AdminCategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "delete category (DELETE)", description = "faz um soft delete na categoria com o id dado como parâmetro.")
+    @Operation(summary = "Excluir Categoria", description = "faz um soft delete na categoria com o id dado como parâmetro.")
     public ResponseEntity<Void> softDeleteCategory(@PathVariable UUID id) {
         categoryService.softDeleteCategory(id);
         return ResponseEntity.noContent().build();

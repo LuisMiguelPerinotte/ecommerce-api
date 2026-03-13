@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth", description = "Responsável por gerenciar as requisições de autenticação de usuários.")
+@Tag(name = "Autenticação", description = "Responsável por gerenciar as requisições de autenticação de usuários.")
 public class AuthController {
     private final AuthService authService;
 
@@ -30,7 +30,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    @Operation(summary = "register (POST)", description = "Valida os dados e registra um novo usuário no sistema.")
+    @Operation(summary = "Registrar Usuário", description = "Valida os dados e registra um novo usuário no sistema.")
     public ResponseEntity<UserResponseDTO> registerUser(
             @Valid
             @RequestBody RegisterRequestDTO registerRequestDTO
@@ -40,7 +40,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @Operation(summary = "login (POST)", description = "Realiza o login do usuário, valida as credenciais e gera um token JWT se a autenticação for bem-sucedida." )
+    @Operation(summary = "Login do Usuário", description = "Realiza o login do usuário, valida as credenciais e gera um token JWT se a autenticação for bem-sucedida." )
     public ResponseEntity<AuthResponseDTO> loginUser(
             @Valid
             @RequestBody LoginRequestDTO loginRequestDTO
@@ -50,7 +50,7 @@ public class AuthController {
 
 
     @PostMapping("/refresh")
-    @Operation(summary = "refresh token (POST)", description = "Renova o token com um refreshToken válido")
+    @Operation(summary = "Renovar Token", description = "Renova o token com um refreshToken válido")
     public ResponseEntity<AuthResponseDTO> refreshLoginToken(
             @Valid
             @RequestBody RefreshRequestDTO refreshRequestDTO
@@ -62,7 +62,7 @@ public class AuthController {
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "get logged user (GET)", description = "Retorna dados do usuário logado")
+    @Operation(summary = "Obter Usuário Logado", description = "Retorna dados do usuário logado")
     public ResponseEntity<UserResponseDTO> getLoggedUser(@AuthenticationPrincipal User user) {
         return new ResponseEntity<>(authService.loggedUser(user), HttpStatus.OK);
     }
@@ -70,7 +70,7 @@ public class AuthController {
 
     @PostMapping("/change-password")
     @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "change password (POST)", description = "Muda a senha (Precisa da senha Atual)")
+    @Operation(summary = "Alterar Senha", description = "Muda a senha (Precisa da senha Atual)")
     public ResponseEntity<Void> changeUserPassword(
             @Valid
             @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO,
@@ -83,7 +83,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "user logout (POST)", description = "Inválida o refresh token atual!")
+    @Operation(summary = "Logout do Usuário", description = "Inválida o refresh token atual!")
     public ResponseEntity<Void> userLogout(
             @AuthenticationPrincipal User user,
             HttpServletRequest request

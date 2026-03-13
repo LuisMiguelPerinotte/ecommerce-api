@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/categories")
-@Tag(name = "Category", description = "Opções de Get das Categorias.")
+@Tag(name = "Categoria", description = "Opções de Get das Categorias.")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -25,7 +25,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    @Operation(summary = "get all categories (GET)", description = "retorna todas as categorias em paginas e em número de itens escolidos.")
+    @Operation(summary = "Obter Todas as Categorias", description = "retorna todas as categorias em paginas e em número de itens escolidos.")
     public ResponseEntity<Page<GetAllActiveCategoriesDTO>> getAllCategories(
             @PageableDefault(size = 20)Pageable pageable
             ) {
@@ -34,7 +34,7 @@ public class CategoryController {
 
 
     @GetMapping("/{id}")
-    @Operation(summary = "get category (GET)", description = "retorna uma categoria especifica pelo id dela.")
+    @Operation(summary = "Obter Categoria por ID", description = "retorna uma categoria especifica pelo id dela.")
     public ResponseEntity<GetCategoryResponseDTO> getCategoryById(@PathVariable UUID id) {
         return new ResponseEntity<>(categoryService.getCategoryById(id), HttpStatus.OK);
     }

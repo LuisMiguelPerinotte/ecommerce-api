@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
-@Tag(name = "Product", description = "Operações Get Produtos")
+@Tag(name = "Produto", description = "Operações Get Produtos")
 public class ProductController {
     private final ProductService productService;
 
@@ -26,7 +26,7 @@ public class ProductController {
     }
 
     @GetMapping
-    @Operation(summary = "get products (GET)", description = "Retorna produtos por parâmetros de busca.")
+    @Operation(summary = "Obter Produtos", description = "Retorna produtos por parâmetros de busca.")
     public ResponseEntity<Page<GetAllProductsResponseDTO>> getAllProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) UUID categoryId,
@@ -39,7 +39,7 @@ public class ProductController {
 
 
     @GetMapping("/{id}")
-    @Operation(summary = "get product by id (GET)", description = "Retorna um produto pelo o Id")
+    @Operation(summary = "Obter Produto por ID", description = "Retorna um produto pelo o Id")
     public ResponseEntity<GetProductResponseDTO> getProduct(@PathVariable UUID id) {
         return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
     }
