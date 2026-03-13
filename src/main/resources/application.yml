@@ -21,6 +21,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
+    placeholders:
+      admin_email: ${ADMIN_EMAIL}
+      admin_password: ${ADMIN_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET}
