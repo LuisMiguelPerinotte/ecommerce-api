@@ -90,8 +90,14 @@ public class CategoryService {
             throw new CategoryNotFoundException();
         }
 
-        category.setName(updateCategoryRequestDTO.name().toLowerCase().trim());
-        category.setDescription(updateCategoryRequestDTO.description().trim());
+        Optional.ofNullable(updateCategoryRequestDTO.name())
+                .map(String::toLowerCase)
+                .map(String::trim)
+                .ifPresent(category::setName);
+
+        Optional.ofNullable(updateCategoryRequestDTO.description())
+                .map(String::trim)
+                .ifPresent(category::setDescription);
 
         categoryRepository.save(category);
     }

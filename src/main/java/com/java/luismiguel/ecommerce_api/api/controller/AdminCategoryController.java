@@ -35,9 +35,9 @@ public class AdminCategoryController {
     }
 
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "edit category (PUT)", description = "edita uma categoria pelo id dado como parâmetro.")
+    @Operation(summary = "update category (PATCH)", description = "edita uma categoria pelo id dado como parâmetro.")
     public ResponseEntity<Void> editCategory(
             @Valid
             @PathVariable UUID id,
