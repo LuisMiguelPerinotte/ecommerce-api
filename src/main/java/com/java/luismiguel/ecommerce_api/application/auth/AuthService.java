@@ -43,7 +43,7 @@ public class AuthService {
                 .email(registerRequestDTO.email().toLowerCase().trim())
                 .username(registerRequestDTO.username().trim())
                 .password(passwordEncoder.encode(registerRequestDTO.password()))
-                .userRole(UserRole.CUSTOMER)
+                .userRole(UserRole.ROLE_CUSTOMER)
                 .active(Boolean.TRUE)
                 .build();
 
