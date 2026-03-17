@@ -11,7 +11,7 @@ import com.java.luismiguel.ecommerce_api.domain.category.CategoryRepository;
 import com.java.luismiguel.ecommerce_api.domain.product.Product;
 import com.java.luismiguel.ecommerce_api.domain.product.ProductRepository;
 import com.java.luismiguel.ecommerce_api.domain.product.ProductSpecification;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.*;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

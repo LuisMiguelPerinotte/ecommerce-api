@@ -7,8 +7,8 @@ import com.java.luismiguel.ecommerce_api.api.dto.response.CreatedCategoryRespons
 import com.java.luismiguel.ecommerce_api.api.dto.response.GetAllActiveCategoriesDTO;
 import com.java.luismiguel.ecommerce_api.domain.category.Category;
 import com.java.luismiguel.ecommerce_api.domain.category.CategoryRepository;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.CategoryAlreadyExistsException;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.CategoryNotFoundException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.CategoryAlreadyExistsException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.CategoryNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

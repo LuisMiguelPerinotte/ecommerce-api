@@ -1,7 +1,7 @@
 package com.java.luismiguel.ecommerce_api.infrastructure.security.jwt;
 
 import com.java.luismiguel.ecommerce_api.application.auth.RefreshTokenService;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.auth.UserNotFoundException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.auth.UserNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

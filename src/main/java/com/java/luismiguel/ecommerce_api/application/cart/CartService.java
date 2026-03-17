@@ -8,10 +8,10 @@ import com.java.luismiguel.ecommerce_api.api.dto.response.ListCartItemsResponseD
 import com.java.luismiguel.ecommerce_api.domain.cart.*;
 import com.java.luismiguel.ecommerce_api.domain.product.Product;
 import com.java.luismiguel.ecommerce_api.domain.product.ProductRepository;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.CartIsEmptyException;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.CartItemNotFoundException;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.InsufficientStockException;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.ProductNotFoundException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartIsEmptyException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartItemNotFoundException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.InsufficientProductStockException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.ProductNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -149,7 +149,7 @@ public class CartService {
 
     private static void productIsInStock(Product product, Integer quantity) {
         if (product.getStockQuantity() < quantity) {
-            throw new InsufficientStockException();
+            throw new InsufficientProductStockException();
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.infrastructure.exception.auth;
+package com.java.luismiguel.ecommerce_api.infrastructure.exception.business.auth;
 
 import org.springframework.http.HttpStatus;
 

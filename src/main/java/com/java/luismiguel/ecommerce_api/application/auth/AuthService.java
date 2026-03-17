@@ -10,7 +10,7 @@ import com.java.luismiguel.ecommerce_api.domain.cart.Cart;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import com.java.luismiguel.ecommerce_api.domain.user.UserRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
-import com.java.luismiguel.ecommerce_api.infrastructure.exception.auth.*;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.auth.*;
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtProperties;
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtService;
 import org.springframework.dao.DataIntegrityViolationException;
