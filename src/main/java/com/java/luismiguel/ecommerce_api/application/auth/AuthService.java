@@ -6,6 +6,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.request.RefreshRequestDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.request.RegisterRequestDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.response.AuthResponseDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.response.UserResponseDTO;
+import com.java.luismiguel.ecommerce_api.domain.cart.Cart;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import com.java.luismiguel.ecommerce_api.domain.user.UserRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
@@ -47,7 +48,12 @@ public class AuthService {
                 .active(Boolean.TRUE)
                 .build();
 
+        Cart userCart = Cart.builder()
+                .user(user)
+                .build();
+
         try {
+            user.setCart(userCart);
             User savedUser = userRepository.save(user);
             return new UserResponseDTO(
                     savedUser.getUserId(),
@@ -94,27 +100,17 @@ public class AuthService {
 
 
     public AuthResponseDTO refreshToken(RefreshRequestDTO refreshRequestDTO) {
-        System.out.println("Chegou no service");
         String email = jwtService.validateRefreshToken(refreshRequestDTO.refreshToken());
-
-        System.out.println("passou pela validação do jwtservice");
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        System.out.println("passou pela validação de usuario");
-
         if (!refreshTokenService.isValid(user.getUserId(), refreshRequestDTO.refreshToken())) {
-            System.out.println("não passou pela verificação se o token é valido");
             throw new InvalidRefreshTokenException();
         }
-        System.out.println("passou pela verificação se o token é valido");
 
         String newRefreshToken = jwtService.generateRefreshToken(user);
-        System.out.println("gerou refresh token");
-
         refreshTokenService.saveRefreshToken(user.getUserId(), newRefreshToken);
-        System.out.println("salvou refresh token no redis");
 
         return new AuthResponseDTO(
                 jwtService.generateToken(user),
