@@ -1,5 +1,6 @@
 package com.java.luismiguel.ecommerce_api.domain.user;
 
+import com.java.luismiguel.ecommerce_api.domain.cart.Cart;
 import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,6 +43,9 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     Boolean active = Boolean.TRUE;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
