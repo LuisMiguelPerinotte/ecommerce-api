@@ -13,6 +13,7 @@ import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.auth.*;
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtProperties;
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtService;
+import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -39,6 +40,7 @@ public class AuthService {
         this.refreshTokenService = refreshTokenService;
     }
 
+    @Transactional
     public UserResponseDTO registerNewUser(RegisterRequestDTO registerRequestDTO) {
         User user = User.builder()
                 .email(registerRequestDTO.email().toLowerCase().trim())

@@ -1,5 +1,6 @@
 package com.java.luismiguel.ecommerce_api.api.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,7 @@ public record RegisterRequestDTO(
 
         @NotBlank (message = "The E-mail is required!")
         @Size(max = 150)
+        @Email
         String email,
 
         @NotBlank (message = "The Password is required!")

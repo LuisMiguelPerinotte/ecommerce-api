@@ -3,7 +3,7 @@ package com.java.luismiguel.ecommerce_api.infrastructure.exception.business.prod
 import org.springframework.http.HttpStatus;
 
 public class InsufficientProductStockException extends ProductException {
-    public InsufficientProductStockException() {
-        super("Insufficient Stock!", HttpStatus.valueOf(422));
+    public InsufficientProductStockException(String productName) {
+        super("Product '" + productName + " has Insufficient Stock!", HttpStatus.valueOf(422));
     }
 }

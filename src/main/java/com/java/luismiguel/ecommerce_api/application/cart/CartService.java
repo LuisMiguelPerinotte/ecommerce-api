@@ -12,6 +12,7 @@ import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartItemNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.InsufficientProductStockException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.ProductNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -52,6 +53,7 @@ public class CartService {
     }
 
 
+    @Transactional
     public AddedCartItemDTO addCartItem(AddCartItemRequestDTO addCartItemRequestDTO, UUID userId) {
         Cart cart = cartRepository.findByUserUserId(userId);
 
@@ -98,6 +100,7 @@ public class CartService {
     }
 
 
+    @Transactional
     public void updateCartItemQuantity(UpdateCartItemQuantityRequestDTO updateCartItemQuantityRequestDTO, UUID itemId) {
         CartItem cartItem = cartItemRepository.findById(itemId)
                 .orElseThrow(CartItemNotFoundException::new);
@@ -123,6 +126,7 @@ public class CartService {
     }
 
 
+    @Transactional
     public void cleanCart(UUID userId) {
         Cart cart = cartRepository.findByUserUserId(userId);
 
@@ -149,7 +153,7 @@ public class CartService {
 
     private static void productIsInStock(Product product, Integer quantity) {
         if (product.getStockQuantity() < quantity) {
-            throw new InsufficientProductStockException();
+            throw new InsufficientProductStockException(product.getName());
         }
     }
 }
