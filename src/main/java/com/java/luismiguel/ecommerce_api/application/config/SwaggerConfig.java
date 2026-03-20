@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.infrastructure.swagger;
+package com.java.luismiguel.ecommerce_api.application.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -16,7 +16,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("E-Commerce API")
-                        .description("API de E-Commerce com Spring Boot e Stripe")
+                        .description("API de E-Commerce com Spring Boot e Mercado Pago")
                         .version("v1.0.0"))
                 .addSecurityItem(new SecurityRequirement()
                         .addList("bearerAuth"))

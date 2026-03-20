@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.infrastructure.redis;
+package com.java.luismiguel.ecommerce_api.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
