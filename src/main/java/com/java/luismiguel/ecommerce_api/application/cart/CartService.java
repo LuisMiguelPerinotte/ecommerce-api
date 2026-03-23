@@ -63,11 +63,6 @@ public class CartService {
         productIsActive(product);
         productIsInStock(product, addCartItemRequestDTO.quantity());
 
-        Optional<CartItem> existing = cart.getItems().stream()
-                .filter(cartItem -> cartItem.getProduct().getProductId()
-                        .equals(addCartItemRequestDTO.productId()))
-                .findFirst();
-
         BigDecimal subTotal = sumSubTotal(product.getPrice(), addCartItemRequestDTO.quantity());
         CartItem newCartItem = CartItem.builder()
                 .cart(cart)
@@ -76,6 +71,11 @@ public class CartService {
                 .unitPrice(product.getPrice())
                 .subtotal(subTotal)
                 .build();
+
+        Optional<CartItem> existing = cart.getItems().stream()
+                .filter(cartItem -> cartItem.getProduct().getProductId()
+                        .equals(addCartItemRequestDTO.productId()))
+                .findFirst();
 
         if (existing.isPresent()) {
             CartItem cartItem = existing.get();
