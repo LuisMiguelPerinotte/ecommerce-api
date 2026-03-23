@@ -25,6 +25,11 @@ spring:
       admin_email: ${ADMIN_EMAIL}
       admin_password: ${ADMIN_PASSWORD}
 
+  mercadopago:
+    access-token: ${MP_ACCESS_TOKEN}
+    webhook-secret: ${MP_WEBHOOK_SECRET}
+    notification-url: ${MP_NOTIFICATION_URL}
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
