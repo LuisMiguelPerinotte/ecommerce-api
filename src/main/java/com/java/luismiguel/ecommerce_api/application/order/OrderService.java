@@ -7,6 +7,7 @@ import com.java.luismiguel.ecommerce_api.domain.address.Address;
 import com.java.luismiguel.ecommerce_api.domain.address.AddressRepository;
 import com.java.luismiguel.ecommerce_api.domain.cart.Cart;
 import com.java.luismiguel.ecommerce_api.domain.cart.CartItem;
+import com.java.luismiguel.ecommerce_api.domain.cart.CartRepository;
 import com.java.luismiguel.ecommerce_api.domain.order.Order;
 import com.java.luismiguel.ecommerce_api.domain.order.OrderItem;
 import com.java.luismiguel.ecommerce_api.domain.order.OrderRepository;
@@ -16,6 +17,7 @@ import com.java.luismiguel.ecommerce_api.domain.product.ProductRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.address.AddressNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartIsEmptyException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.order.OrderNotCancellableException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.order.OrderNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.InsufficientProductStockException;
@@ -34,17 +36,20 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final CartService cartService;
     private final ProductRepository productRepository;
+    private final CartRepository cartRepository;
 
-    public OrderService(OrderRepository orderRepository, AddressRepository addressRepository, CartService cartService, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, AddressRepository addressRepository, CartService cartService, ProductRepository productRepository, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.addressRepository = addressRepository;
         this.cartService = cartService;
         this.productRepository = productRepository;
+        this.cartRepository = cartRepository;
     }
 
     @Transactional
     public CreatedOrderResponseDTO createOrder(CreateOrderRequestDTO createOrderRequestDTO, User user) {
-        Cart userCart = user.getCart();
+        Cart userCart = cartRepository.findByUserUserIdWithItems(user.getUserId())
+                .orElseThrow(CartNotFoundException::new);
 
         if (userCart.getItems().isEmpty()) {
             throw new CartIsEmptyException();
