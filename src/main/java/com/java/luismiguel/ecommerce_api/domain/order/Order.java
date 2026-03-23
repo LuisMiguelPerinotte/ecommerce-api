@@ -44,9 +44,6 @@ public class Order {
     @Column(name = "total_amount", nullable = false)
     BigDecimal totalAmount;
 
-    @Column(name = "mp_preference_id", nullable = false)
-    String mpPreferenceId;
-
     @Column(name = "user_notes")
     String userNotes;
 
