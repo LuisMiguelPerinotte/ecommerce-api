@@ -1,9 +1,9 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.AdjustProductStockDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.CreateProductRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.UpdateProductRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.CreatedProductResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.request.AdjustProductStockRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.request.CreateProductRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.request.UpdateProductRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.response.CreatedProductResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.product.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,7 +55,7 @@ public class AdminProductController {
     public ResponseEntity<Void> adjustProductStock(
             @Valid
             @PathVariable UUID id,
-            @RequestBody AdjustProductStockDTO adjustProductStockDTO
+            @RequestBody AdjustProductStockRequestDTO adjustProductStockDTO
     ) {
         productService.adjustStock(id, adjustProductStockDTO);
         return ResponseEntity.noContent().build();

@@ -1,10 +1,10 @@
 package com.java.luismiguel.ecommerce_api.application.cart;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.AddCartItemRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.UpdateCartItemQuantityRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.AddedCartItemDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetCartResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.ListCartItemsResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.request.AddCartItemRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.request.UpdateCartItemQuantityRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.response.AddedCartItemDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.response.GetCartResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.response.ListCartItemsResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.cart.*;
 import com.java.luismiguel.ecommerce_api.domain.product.Product;
 import com.java.luismiguel.ecommerce_api.domain.product.ProductRepository;

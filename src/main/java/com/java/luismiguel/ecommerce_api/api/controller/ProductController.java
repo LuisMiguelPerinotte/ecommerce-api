@@ -1,7 +1,7 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetAllProductsResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetProductResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.response.GetAllProductsResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.response.GetProductResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.product.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

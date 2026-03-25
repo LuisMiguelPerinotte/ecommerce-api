@@ -1,11 +1,11 @@
 package com.java.luismiguel.ecommerce_api.application.product;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.AdjustProductStockDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.CreateProductRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.UpdateProductRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.CreatedProductResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetAllProductsResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetProductResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.request.AdjustProductStockRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.request.CreateProductRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.request.UpdateProductRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.response.CreatedProductResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.response.GetAllProductsResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.product.response.GetProductResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.category.Category;
 import com.java.luismiguel.ecommerce_api.domain.category.CategoryRepository;
 import com.java.luismiguel.ecommerce_api.domain.product.Product;
@@ -127,7 +127,7 @@ public class ProductService {
     }
 
 
-    public void adjustStock(UUID id, AdjustProductStockDTO adjustProductStockDTO) {
+    public void adjustStock(UUID id, AdjustProductStockRequestDTO adjustProductStockDTO) {
         Product product = productRepository.findById(id)
                 .orElseThrow(ProductNotFoundException::new);
 

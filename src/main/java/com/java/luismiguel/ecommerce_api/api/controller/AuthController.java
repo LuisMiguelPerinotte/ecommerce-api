@@ -1,11 +1,11 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.ChangePasswordRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.LoginRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.RefreshRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.RegisterRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.AuthResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.UserResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.auth.request.ChangePasswordRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.auth.request.LoginRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.auth.request.RefreshRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.auth.request.RegisterRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.auth.response.AuthResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.auth.response.UserResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.auth.AuthService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;

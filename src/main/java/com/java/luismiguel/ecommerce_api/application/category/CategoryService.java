@@ -1,10 +1,10 @@
 package com.java.luismiguel.ecommerce_api.application.category;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.CreateCategoryRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.UpdateCategoryRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetCategoryResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.CreatedCategoryResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetAllActiveCategoriesDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.request.CreateCategoryRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.request.UpdateCategoryRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.response.GetCategoryResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.response.CreatedCategoryResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.response.GetAllActiveCategoriesDTO;
 import com.java.luismiguel.ecommerce_api.domain.category.Category;
 import com.java.luismiguel.ecommerce_api.domain.category.CategoryRepository;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.CategoryAlreadyExistsException;

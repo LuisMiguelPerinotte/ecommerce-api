@@ -1,6 +1,6 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.response.CheckoutResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.payment.response.CheckoutResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.payment.PaymentService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;

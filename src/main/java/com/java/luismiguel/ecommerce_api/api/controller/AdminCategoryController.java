@@ -1,8 +1,8 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.CreateCategoryRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.UpdateCategoryRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.CreatedCategoryResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.request.CreateCategoryRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.request.UpdateCategoryRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.category.response.CreatedCategoryResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

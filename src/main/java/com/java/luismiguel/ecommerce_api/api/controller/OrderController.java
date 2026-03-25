@@ -1,9 +1,9 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.CreateOrderRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.CreatedOrderResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetAllUserOrderResponseDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetOrderResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.order.request.CreateOrderRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.order.response.CreatedOrderResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.order.response.GetAllUserOrderResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.order.response.GetOrderResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.order.OrderService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,6 +1,6 @@
 package com.java.luismiguel.ecommerce_api.application.payment;
 
-import com.java.luismiguel.ecommerce_api.api.dto.response.CheckoutResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.payment.response.CheckoutResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.order.Order;
 import com.java.luismiguel.ecommerce_api.domain.order.OrderRepository;
 import com.java.luismiguel.ecommerce_api.domain.order.enums.OrderStatus;

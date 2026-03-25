@@ -1,9 +1,9 @@
 package com.java.luismiguel.ecommerce_api.api.controller;
 
-import com.java.luismiguel.ecommerce_api.api.dto.request.AddCartItemRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.request.UpdateCartItemQuantityRequestDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.AddedCartItemDTO;
-import com.java.luismiguel.ecommerce_api.api.dto.response.GetCartResponseDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.request.AddCartItemRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.request.UpdateCartItemQuantityRequestDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.response.AddedCartItemDTO;
+import com.java.luismiguel.ecommerce_api.api.dto.cart.response.GetCartResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.cart.CartService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;
