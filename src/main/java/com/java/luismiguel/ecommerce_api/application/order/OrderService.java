@@ -135,10 +135,12 @@ public class OrderService {
         GetAddressResponseDTO addressDTO = new GetAddressResponseDTO(
                 address.getAddressId(),
                 address.getStreet(),
+                address.getHouseNumber(),
                 address.getComplement(),
+                address.getNeighborhood(),
+                address.getCity(),
                 address.getState(),
-                address.getZipCode(),
-                address.getCountry()
+                address.getZipCode()
         );
 
         return new GetOrderResponseDTO(
