@@ -87,7 +87,7 @@ public class AddressController {
     }
 
 
-    @PatchMapping("/{addressId}")
+    @PatchMapping("/{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Alterar Endereço Padrão", description = "")
     public ResponseEntity<Void> changeDefaultAddress(
