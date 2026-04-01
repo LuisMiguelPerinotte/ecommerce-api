@@ -7,6 +7,10 @@ import com.java.luismiguel.ecommerce_api.api.dto.product.response.CreatedProduct
 import com.java.luismiguel.ecommerce_api.application.product.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/products")
-@Tag(name = "Gerenciamento de Produtos do Administrador", description = "APIs para administradores gerenciarem produtos, incluindo criação, atualizações, ajustes de estoque, ativação, desativação e exclusão.")
+@Tag(name = "Admin Products", description = "APIs for administrators to manage products: create, update, stock adjustments, activate/deactivate and delete.")
 public class AdminProductController {
     private final ProductService productService;
 
@@ -27,7 +31,13 @@ public class AdminProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Criar Produto (POST)", description = "Cria um novo produto no sistema. Requer privilégios de administrador.")
+    @Operation(summary = "Create Product", description = "Create a new product. Requires ADMIN privileges.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Product created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedProductResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid product data", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Product with same SKU or identifier already exists (conflict)", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content)
+    })
     public ResponseEntity<CreatedProductResponseDTO> createProduct(
             @Valid
             @RequestBody CreateProductRequestDTO createProductRequestDTO
@@ -38,7 +48,13 @@ public class AdminProductController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Atualizar Produto (PATCH)", description = "Atualiza os detalhes de um produto existente identificado pelo seu ID. Requer privilégios de administrador.")
+    @Operation(summary = "Update Product", description = "Update details of an existing product by ID. Requires ADMIN privileges.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Product updated (no content)"),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid product fields", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
+    })
     public ResponseEntity<Void> updateProduct(
             @Valid
             @PathVariable UUID id,
@@ -51,7 +67,13 @@ public class AdminProductController {
 
     @PatchMapping("/{id}/stock")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Ajustar Estoque do Produto (PATCH)", description = "Ajusta a quantidade de estoque de um produto. Requer privilégios de administrador.")
+    @Operation(summary = "Adjust Product Stock", description = "Adjust the stock quantity of a product. Requires ADMIN privileges.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Stock adjusted (no content)"),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid stock quantity", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
+    })
     public ResponseEntity<Void> adjustProductStock(
             @Valid
             @PathVariable UUID id,
@@ -64,7 +86,12 @@ public class AdminProductController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Excluir Produto (DELETE)", description = "Exclui suavemente um produto, marcando-o como inativo. Requer privilégios de administrador.")
+    @Operation(summary = "Soft Delete Product", description = "Soft delete a product, marking it inactive. Requires ADMIN privileges.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Product soft-deleted (no content)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
+    })
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
         productService.softDeleteProduct(id);
         return ResponseEntity.noContent().build();
@@ -73,7 +100,12 @@ public class AdminProductController {
 
     @PatchMapping("/{id}/activate")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Ativar Produto (PATCH)", description = "Ativa um produto previamente desativado. Requer privilégios de administrador.")
+    @Operation(summary = "Activate Product", description = "Activate a previously deactivated product. Requires ADMIN privileges.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Product activated (no content)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
+    })
     public ResponseEntity<Void> activateProduct(@PathVariable UUID id) {
         productService.activateProduct(id);
         return ResponseEntity.noContent().build();
@@ -82,7 +114,12 @@ public class AdminProductController {
 
     @PatchMapping("/{id}/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Desativar Produto (PATCH)", description = "Desativa um produto, tornando-o indisponível. Requer privilégios de administrador.")
+    @Operation(summary = "Deactivate Product", description = "Deactivate a product, making it unavailable. Requires ADMIN privileges.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Product deactivated (no content)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
+    })
     public ResponseEntity<Void> deactivateProduct(@PathVariable UUID id) {
         productService.deactivateProduct(id);
         return ResponseEntity.noContent().build();

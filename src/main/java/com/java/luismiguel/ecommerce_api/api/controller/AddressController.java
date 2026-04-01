@@ -9,6 +9,10 @@ import com.java.luismiguel.ecommerce_api.application.address.AddressService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +26,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/addresses")
-@Tag(name = "Endereços", description = "")
+@Tag(name = "Addresses", description = "Operations to manage user shipping addresses")
 public class AddressController {
     private final AddressService addressService;
 
@@ -32,7 +36,12 @@ public class AddressController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Criar Endereço", description = "")
+    @Operation(summary = "Create Address", description = "Create a new shipping address for the authenticated user.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Address created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedAddressResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid address data", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Duplicate address for user (address already exists)", content = @Content)
+    })
     public ResponseEntity<CreatedAddressResponseDTO> createAddress(
             @Valid
             @RequestBody CreateAddressRequestDTO createAddressRequestDTO,
@@ -44,7 +53,10 @@ public class AddressController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Obter Todos Endereços", description = "")
+    @Operation(summary = "Get User Addresses", description = "Return a pageable list of addresses for the authenticated user.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Paginated list of user addresses returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAllUserAddressesResponseDTO.class)))
+    })
     public ResponseEntity<Page<GetAllUserAddressesResponseDTO>> getUserAddresses(
             @AuthenticationPrincipal User user,
             Pageable pageable
@@ -55,7 +67,11 @@ public class AddressController {
 
     @GetMapping("/{addressId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Obter Endereço Por Id", description = "")
+    @Operation(summary = "Get Address by ID", description = "Returns an address by its ID for the authenticated user.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Address returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAddressResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Address not found for the authenticated user", content = @Content)
+    })
     public ResponseEntity<GetAddressResponseDTO> getAddressById(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal User user
@@ -66,7 +82,11 @@ public class AddressController {
 
     @DeleteMapping("/{addressId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Deletar Endereço Por Id", description = "")
+    @Operation(summary = "Delete Address by ID", description = "Soft-delete an address by its ID. Only the owner can delete their address.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Address deleted (no content)"),
+            @ApiResponse(responseCode = "404", description = "Address not found or not owned by user", content = @Content)
+    })
     public ResponseEntity<Void> deleteAddress(@PathVariable UUID addressId) {
         addressService.deleteAddressById(addressId);
         return ResponseEntity.noContent().build();
@@ -75,7 +95,12 @@ public class AddressController {
 
     @PatchMapping("/{addressId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Atualizar Endereço Parcialmente", description = "")
+    @Operation(summary = "Partially Update Address", description = "Partially update address fields for the authenticated user's address.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Address updated (no content)"),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid address fields", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Address not found or not owned by user", content = @Content)
+    })
     public ResponseEntity<Void> updateAddress(
             @Valid
             @PathVariable UUID addressId,
@@ -89,7 +114,11 @@ public class AddressController {
 
     @PatchMapping("/{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Alterar Endereço Padrão", description = "")
+    @Operation(summary = "Change Default Address", description = "Set the specified address as the default for the authenticated user.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Default address changed (no content)"),
+            @ApiResponse(responseCode = "404", description = "Address not found or not owned by user", content = @Content)
+    })
     public ResponseEntity<Void> changeDefaultAddress(
             @PathVariable UUID addressId,
             @AuthenticationPrincipal User user

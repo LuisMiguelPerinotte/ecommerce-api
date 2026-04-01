@@ -10,6 +10,10 @@ import com.java.luismiguel.ecommerce_api.application.auth.AuthService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Autenticação", description = "Responsável por gerenciar as requisições de autenticação de usuários.")
+@Tag(name = "Authentication", description = "Handles user authentication and token management")
 public class AuthController {
     private final AuthService authService;
 
@@ -30,7 +34,12 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    @Operation(summary = "Registrar Usuário", description = "Valida os dados e registra um novo usuário no sistema.")
+    @Operation(summary = "Register User", description = "Validates input and registers a new user. Returns user data without sensitive fields.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid registration data", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Email already registered (conflict)", content = @Content)
+    })
     public ResponseEntity<UserResponseDTO> registerUser(
             @Valid
             @RequestBody RegisterRequestDTO registerRequestDTO
@@ -40,7 +49,11 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @Operation(summary = "Login do Usuário", description = "Realiza o login do usuário, valida as credenciais e gera um token JWT se a autenticação for bem-sucedida." )
+    @Operation(summary = "User Login", description = "Authenticates the user and returns an access JWT and a refresh token upon successful authentication.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Authentication successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content)
+    })
     public ResponseEntity<AuthResponseDTO> loginUser(
             @Valid
             @RequestBody LoginRequestDTO loginRequestDTO
@@ -50,7 +63,12 @@ public class AuthController {
 
 
     @PostMapping("/refresh")
-    @Operation(summary = "Renovar Token", description = "Renova o token com um refreshToken válido")
+    @Operation(summary = "Refresh Token", description = "Refresh the access token using a valid refresh token.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Token refreshed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid refresh token payload", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: invalid or expired refresh token", content = @Content)
+    })
     public ResponseEntity<AuthResponseDTO> refreshLoginToken(
             @Valid
             @RequestBody RefreshRequestDTO refreshRequestDTO
@@ -61,16 +79,23 @@ public class AuthController {
 
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "Obter Usuário Logado", description = "Retorna dados do usuário logado")
+    @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @Operation(summary = "Get Logged User", description = "Returns the authenticated user's profile information based on the JWT.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User data returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class)))
+    })
     public ResponseEntity<UserResponseDTO> getLoggedUser(@AuthenticationPrincipal User user) {
         return new ResponseEntity<>(authService.loggedUser(user), HttpStatus.OK);
     }
 
 
     @PostMapping("/change-password")
-    @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "Alterar Senha", description = "Muda a senha (Precisa da senha Atual)")
+    @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @Operation(summary = "Change Password", description = "Change the authenticated user's password. Requires current password for verification.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Password changed (no content)"),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid password payload", content = @Content)
+    })
     public ResponseEntity<Void> changeUserPassword(
             @Valid
             @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO,
@@ -82,8 +107,12 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    @PreAuthorize("hasRole('CUSTOMER', 'ADMIN')")
-    @Operation(summary = "Logout do Usuário", description = "Inválida o refresh token atual!")
+    @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @Operation(summary = "User Logout", description = "Invalidates the current refresh token and logs the user out.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Logged out (no content)"),
+            // Authentication errors are handled globally by the SecurityScheme; no 401 documented here
+    })
     public ResponseEntity<Void> userLogout(
             @AuthenticationPrincipal User user,
             HttpServletRequest request

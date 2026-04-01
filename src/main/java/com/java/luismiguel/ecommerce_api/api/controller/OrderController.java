@@ -8,6 +8,10 @@ import com.java.luismiguel.ecommerce_api.application.order.OrderService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +26,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/orders")
-@Tag(name = "Pedidos", description = "")
+@Tag(name = "Orders", description = "Order management endpoints")
 public class OrderController {
     private final OrderService orderService;
 
@@ -32,7 +36,13 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Criar Pedido", description = "")
+    @Operation(summary = "Create Order", description = "Create an order from the authenticated user's cart or provided payload.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Order created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedOrderResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid order payload", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Cart or address not found", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Insufficient stock for one or more products", content = @Content)
+    })
     public ResponseEntity<CreatedOrderResponseDTO> createOrder(
             @Valid
             @RequestBody CreateOrderRequestDTO createOrderRequestDTO,
@@ -44,7 +54,10 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Obter Pedidos", description = "")
+    @Operation(summary = "Get User Orders", description = "Return a pageable list of the authenticated user's orders.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Paginated list of user orders", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAllUserOrderResponseDTO.class)))
+    })
     public ResponseEntity<Page<GetAllUserOrderResponseDTO>> getUserOrders(
             @PageableDefault(size = 20) Pageable pageable,
             @AuthenticationPrincipal User user
@@ -55,7 +68,11 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Obter Pedido Pelo Id", description = "")
+    @Operation(summary = "Get Order by ID", description = "Return detailed information about a specific order by ID.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Order returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetOrderResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
+    })
     public ResponseEntity<GetOrderResponseDTO> getOrderById(@PathVariable UUID orderId) {
         return new ResponseEntity<>(orderService.getOrderById(orderId), HttpStatus.OK);
     }
@@ -63,7 +80,12 @@ public class OrderController {
 
     @PostMapping("/{orderId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Cancelar Pedido", description = "")
+    @Operation(summary = "Cancel Order", description = "Cancel an order by ID if cancellation rules apply.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Order canceled (no content)"),
+            @ApiResponse(responseCode = "422", description = "Order cannot be cancelled in its current state", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
+    })
     public ResponseEntity<Void> cancelOrderById(
             @PathVariable UUID orderId,
             @AuthenticationPrincipal User user

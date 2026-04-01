@@ -6,6 +6,10 @@ import com.java.luismiguel.ecommerce_api.api.dto.category.response.CreatedCatego
 import com.java.luismiguel.ecommerce_api.application.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/categories")
-@Tag(name = "Gerenciamento de Categorias do Administrador", description = "APIs para administradores gerenciarem categorias, incluindo criação, atualização e exclusão.")
+@Tag(name = "Admin Categories", description = "APIs for administrators to manage categories, including creation, update and deletion.")
 public class AdminCategoryController {
     private final CategoryService categoryService;
 
@@ -26,7 +30,13 @@ public class AdminCategoryController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Criar Categoria", description = "Cria uma categoria com as informações do request.")
+    @Operation(summary = "Create Category", description = "Create a new category with the provided information.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Category created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedCategoryResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid category data", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Category already exists (conflict)", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content)
+    })
     public ResponseEntity<CreatedCategoryResponseDTO> createCategory(
             @Valid
             @RequestBody CreateCategoryRequestDTO createCategoryRequestDTO
@@ -37,7 +47,13 @@ public class AdminCategoryController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Atualizar Categoria", description = "edita uma categoria pelo id dado como parâmetro.")
+    @Operation(summary = "Update Category", description = "Update an existing category by the provided id.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Category updated (no content)"),
+            @ApiResponse(responseCode = "400", description = "Validation error: invalid category fields", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
+    })
     public ResponseEntity<Void> editCategory(
             @Valid
             @PathVariable UUID id,
@@ -50,7 +66,12 @@ public class AdminCategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Excluir Categoria", description = "faz um soft delete na categoria com o id dado como parâmetro.")
+    @Operation(summary = "Soft Delete Category", description = "Soft delete a category by id (marks as inactive).")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Category soft-deleted (no content)"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
+    })
     public ResponseEntity<Void> softDeleteCategory(@PathVariable UUID id) {
         categoryService.softDeleteCategory(id);
         return ResponseEntity.noContent().build();

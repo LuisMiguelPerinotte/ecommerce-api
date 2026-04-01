@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -64,10 +65,8 @@ public class OrderService {
         cartItems.forEach(item ->
                 productIsInStock(item.getProduct(), item.getQuantity()));
 
-        Address address = addressRepository.findById(createOrderRequestDTO.addressId())
-                .orElseThrow(AddressNotFoundException::new);
-
-        if (!address.getUser().getUserId().equals(user.getUserId())) {
+        Address address = verifyAddress(createOrderRequestDTO.addressId(), user.getUserId());
+        if (address.getUser().getUserId() != user.getUserId()) {
             throw new AddressNotFoundException();
         }
 
@@ -140,7 +139,8 @@ public class OrderService {
                 address.getNeighborhood(),
                 address.getCity(),
                 address.getState(),
-                address.getZipCode()
+                address.getZipCode(),
+                address.getIsDefault()
         );
 
         return new GetOrderResponseDTO(
@@ -224,5 +224,17 @@ public class OrderService {
             product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity());
             productRepository.save(product);
         });
+    }
+
+
+    private Address verifyAddress(UUID addressId, UUID userId) {
+        if (addressId == null) {
+            return addressRepository.findByUserUserIdAndIsDefaultTrue(userId)
+                    .orElseThrow(AddressNotFoundException::new);
+
+        } else {
+            return addressRepository.findById(addressId)
+                    .orElseThrow(AddressNotFoundException::new);
+        }
     }
 }
