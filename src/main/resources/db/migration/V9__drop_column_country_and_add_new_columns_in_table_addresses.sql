@@ -1,0 +1,5 @@
+ALTER TABLE addresses
+    DROP COLUMN country,
+    ADD COLUMN house_number VARCHAR NOT NULL,
+    ADD COLUMN neighborhood VARCHAR NOT NULL,
+    ADD COLUMN city VARCHAR NOT NULL;
