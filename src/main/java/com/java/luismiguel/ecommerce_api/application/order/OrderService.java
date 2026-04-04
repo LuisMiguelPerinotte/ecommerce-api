@@ -20,21 +20,23 @@ import com.java.luismiguel.ecommerce_api.domain.product.Product;
 import com.java.luismiguel.ecommerce_api.domain.product.ProductRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.address.AddressNotFoundException;
+import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.address.NoDefaultAddressRegisteredException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartIsEmptyException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.order.OrderNotCancellableException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.order.OrderNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.InsufficientProductStockException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
@@ -66,7 +68,7 @@ public class OrderService {
                 productIsInStock(item.getProduct(), item.getQuantity()));
 
         Address address = verifyAddress(createOrderRequestDTO.addressId(), user.getUserId());
-        if (address.getUser().getUserId() != user.getUserId()) {
+        if (!address.getUser().getUserId().equals(user.getUserId())) {
             throw new AddressNotFoundException();
         }
 
@@ -230,8 +232,7 @@ public class OrderService {
     private Address verifyAddress(UUID addressId, UUID userId) {
         if (addressId == null) {
             return addressRepository.findByUserUserIdAndIsDefaultTrue(userId)
-                    .orElseThrow(AddressNotFoundException::new);
-
+                    .orElseThrow(NoDefaultAddressRegisteredException::new);
         } else {
             return addressRepository.findById(addressId)
                     .orElseThrow(AddressNotFoundException::new);
