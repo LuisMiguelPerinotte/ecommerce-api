@@ -34,3 +34,28 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+resilience4j:
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 100
+        limit-refresh-period: 60s
+        timeout-duration: 0
+        register-health-indicator: true
+
+    instances:
+      public-api:
+            base-config: default
+            limit-for-period: 50
+            limit-refresh-period: 60s
+
+      create-resource:
+            base-config: default
+            limit-for-period: 10
+            limit-refresh-period: 60s
+
+      critical:
+            base-config: default
+            limit-for-period: 5
+            limit-refresh-period: 60s
