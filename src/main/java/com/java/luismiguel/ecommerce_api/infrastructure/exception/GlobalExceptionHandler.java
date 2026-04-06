@@ -4,6 +4,7 @@ import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.Busin
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.auth.AuthException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.cart.CartException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.ProductException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +36,17 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
         return new ResponseEntity<>(body, e.getStatus());
+    }
+
+
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<Object> handleRateLimitExceeded(RequestNotPermitted ex) {
+        HashMap<String, Object> body = errorBuilder(
+                HttpStatus.TOO_MANY_REQUESTS,
+                "Too Many Requests",
+                "Rate limit exceeded. Please try again later."
+        );
+        return new ResponseEntity<>(body, HttpStatus.TOO_MANY_REQUESTS);
     }
 
 
