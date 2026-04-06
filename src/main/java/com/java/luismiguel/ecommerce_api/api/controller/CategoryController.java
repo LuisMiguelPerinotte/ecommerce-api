@@ -3,6 +3,7 @@ package com.java.luismiguel.ecommerce_api.api.controller;
 import com.java.luismiguel.ecommerce_api.api.dto.category.response.GetCategoryResponseDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.category.response.GetAllActiveCategoriesDTO;
 import com.java.luismiguel.ecommerce_api.application.category.CategoryService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +30,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get Categories", description = "Return paginated active categories.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of active categories", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAllActiveCategoriesDTO.class)))
@@ -41,6 +43,7 @@ public class CategoryController {
 
 
     @GetMapping("/{id}")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get Category by ID", description = "Return a specific category by its ID.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Category returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetCategoryResponseDTO.class))),

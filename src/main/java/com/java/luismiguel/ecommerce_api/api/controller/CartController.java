@@ -6,6 +6,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.cart.response.AddedCartItemDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.cart.response.GetCartResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.cart.CartService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,6 +34,7 @@ public class CartController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get Cart", description = "Return the authenticated user's cart with items and totals.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Cart returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetCartResponseDTO.class)))
@@ -44,6 +46,7 @@ public class CartController {
 
     @PostMapping("/items")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Add Item to Cart", description = "Add a product to the authenticated user's cart. If the item exists, quantity is increased.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Item added to cart", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddedCartItemDTO.class))),
@@ -60,6 +63,7 @@ public class CartController {
 
     @PutMapping("/items/{itemId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Update Cart Item Quantity", description = "Update the quantity of a cart item identified by itemId.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Quantity updated (no content)"),
@@ -78,6 +82,7 @@ public class CartController {
 
     @DeleteMapping("/items/{itemId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Remove Cart Item", description = "Remove a specific item from the authenticated user's cart.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Item removed (no content)"),
@@ -91,6 +96,7 @@ public class CartController {
 
     @DeleteMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Clear Cart", description = "Remove all items from the authenticated user's cart.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Cart cleared (no content)")

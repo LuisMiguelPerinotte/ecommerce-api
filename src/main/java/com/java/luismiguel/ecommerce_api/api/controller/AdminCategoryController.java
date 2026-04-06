@@ -4,6 +4,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.category.request.CreateCategory
 import com.java.luismiguel.ecommerce_api.api.dto.category.request.UpdateCategoryRequestDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.category.response.CreatedCategoryResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.category.CategoryService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +31,7 @@ public class AdminCategoryController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Create Category", description = "Create a new category with the provided information.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Category created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedCategoryResponseDTO.class))),
@@ -47,6 +49,7 @@ public class AdminCategoryController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Update Category", description = "Update an existing category by the provided id.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Category updated (no content)"),
@@ -66,6 +69,7 @@ public class AdminCategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Soft Delete Category", description = "Soft delete a category by id (marks as inactive).")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Category soft-deleted (no content)"),

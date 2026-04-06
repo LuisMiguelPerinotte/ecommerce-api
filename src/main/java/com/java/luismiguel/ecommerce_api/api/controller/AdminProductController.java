@@ -5,6 +5,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.product.request.CreateProductRe
 import com.java.luismiguel.ecommerce_api.api.dto.product.request.UpdateProductRequestDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.product.response.CreatedProductResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.product.ProductService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,6 +32,7 @@ public class AdminProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Create Product", description = "Create a new product. Requires ADMIN privileges.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Product created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedProductResponseDTO.class))),
@@ -48,6 +50,7 @@ public class AdminProductController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Update Product", description = "Update details of an existing product by ID. Requires ADMIN privileges.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Product updated (no content)"),
@@ -67,6 +70,7 @@ public class AdminProductController {
 
     @PatchMapping("/{id}/stock")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Adjust Product Stock", description = "Adjust the stock quantity of a product. Requires ADMIN privileges.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Stock adjusted (no content)"),
@@ -86,6 +90,7 @@ public class AdminProductController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Soft Delete Product", description = "Soft delete a product, marking it inactive. Requires ADMIN privileges.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Product soft-deleted (no content)"),
@@ -100,6 +105,7 @@ public class AdminProductController {
 
     @PatchMapping("/{id}/activate")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Activate Product", description = "Activate a previously deactivated product. Requires ADMIN privileges.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Product activated (no content)"),
@@ -114,6 +120,7 @@ public class AdminProductController {
 
     @PatchMapping("/{id}/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Deactivate Product", description = "Deactivate a product, making it unavailable. Requires ADMIN privileges.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Product deactivated (no content)"),

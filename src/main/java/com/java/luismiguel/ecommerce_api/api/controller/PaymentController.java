@@ -3,6 +3,7 @@ package com.java.luismiguel.ecommerce_api.api.controller;
 import com.java.luismiguel.ecommerce_api.api.dto.payment.response.CheckoutResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.payment.PaymentService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +31,7 @@ public class PaymentController {
 
     @PostMapping("/checkout/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Create Checkout", description = "Create a checkout preference for the given order and return checkout data (Mercado Pago).")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Checkout created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CheckoutResponseDTO.class))),

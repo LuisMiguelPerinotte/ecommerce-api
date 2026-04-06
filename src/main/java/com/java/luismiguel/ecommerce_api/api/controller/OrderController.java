@@ -6,6 +6,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.order.response.GetAllUserOrderR
 import com.java.luismiguel.ecommerce_api.api.dto.order.response.GetOrderResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.order.OrderService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +37,7 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Create Order", description = "Create an order from the authenticated user's cart or provided payload.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Order created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedOrderResponseDTO.class))),
@@ -54,6 +56,7 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get User Orders", description = "Return a pageable list of the authenticated user's orders.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of user orders", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAllUserOrderResponseDTO.class)))
@@ -68,6 +71,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get Order by ID", description = "Return detailed information about a specific order by ID.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Order returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetOrderResponseDTO.class))),
@@ -80,6 +84,7 @@ public class OrderController {
 
     @PostMapping("/{orderId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Cancel Order", description = "Cancel an order by ID if cancellation rules apply.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Order canceled (no content)"),

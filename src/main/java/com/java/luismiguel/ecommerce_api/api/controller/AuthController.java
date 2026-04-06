@@ -8,6 +8,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.auth.response.AuthResponseDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.auth.response.UserResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.auth.AuthService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,6 +35,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Register User", description = "Validates input and registers a new user. Returns user data without sensitive fields.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
@@ -49,6 +51,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
+    @RateLimiter(name = "critical")
     @Operation(summary = "User Login", description = "Authenticates the user and returns an access JWT and a refresh token upon successful authentication.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Authentication successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.class))),
@@ -63,6 +66,7 @@ public class AuthController {
 
 
     @PostMapping("/refresh")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Refresh Token", description = "Refresh the access token using a valid refresh token.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Token refreshed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.class))),
@@ -80,6 +84,7 @@ public class AuthController {
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get Logged User", description = "Returns the authenticated user's profile information based on the JWT.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User data returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class)))
@@ -91,6 +96,7 @@ public class AuthController {
 
     @PostMapping("/change-password")
     @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Change Password", description = "Change the authenticated user's password. Requires current password for verification.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Password changed (no content)"),
@@ -108,6 +114,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "User Logout", description = "Invalidates the current refresh token and logs the user out.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Logged out (no content)"),

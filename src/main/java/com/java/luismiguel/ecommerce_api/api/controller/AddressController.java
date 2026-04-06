@@ -7,6 +7,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.address.response.GetAddressResp
 import com.java.luismiguel.ecommerce_api.api.dto.address.response.GetAllUserAddressesResponseDTO;
 import com.java.luismiguel.ecommerce_api.application.address.AddressService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +37,7 @@ public class AddressController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Create Address", description = "Create a new shipping address for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Address created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CreatedAddressResponseDTO.class))),
@@ -53,6 +55,7 @@ public class AddressController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get User Addresses", description = "Return a pageable list of addresses for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of user addresses returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAllUserAddressesResponseDTO.class)))
@@ -67,6 +70,7 @@ public class AddressController {
 
     @GetMapping("/{addressId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "public-api")
     @Operation(summary = "Get Address by ID", description = "Returns an address by its ID for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Address returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAddressResponseDTO.class))),
@@ -82,6 +86,7 @@ public class AddressController {
 
     @DeleteMapping("/{addressId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "critical")
     @Operation(summary = "Delete Address by ID", description = "Soft-delete an address by its ID. Only the owner can delete their address.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Address deleted (no content)"),
@@ -95,6 +100,7 @@ public class AddressController {
 
     @PatchMapping("/{addressId}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Partially Update Address", description = "Partially update address fields for the authenticated user's address.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Address updated (no content)"),
@@ -114,6 +120,7 @@ public class AddressController {
 
     @PatchMapping("/{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @RateLimiter(name = "create-resource")
     @Operation(summary = "Change Default Address", description = "Set the specified address as the default for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Default address changed (no content)"),
