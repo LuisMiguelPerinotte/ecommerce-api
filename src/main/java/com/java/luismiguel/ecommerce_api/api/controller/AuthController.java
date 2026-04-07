@@ -77,7 +77,6 @@ public class AuthController {
             @Valid
             @RequestBody RefreshRequestDTO refreshRequestDTO
     ) {
-        System.out.println("Chegou no controller");
         return new ResponseEntity<>(authService.refreshToken(refreshRequestDTO), HttpStatus.OK);
     }
 
