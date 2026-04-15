@@ -50,6 +50,10 @@ resilience4j:
             limit-for-period: 50
             limit-refresh-period: 60s
 
+      admin-endpoints:
+          limit-for-period: 30
+          limit-refresh-period: 60s
+
       create-resource:
             base-config: default
             limit-for-period: 10
