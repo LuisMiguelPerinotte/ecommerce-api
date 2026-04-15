@@ -4,6 +4,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.admin.request.ChangeUserRoleReq
 import com.java.luismiguel.ecommerce_api.api.dto.admin.response.*;
 import com.java.luismiguel.ecommerce_api.application.admin.AdminService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,7 @@ public class AdminPanelController {
 
     @GetMapping("/dashboard")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Get Admin Dashboard", description = "")
     @ApiResponses()
     public ResponseEntity<DashboardResponseDTO> dashboard() {
@@ -42,6 +44,7 @@ public class AdminPanelController {
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Get Users", description = "")
     @ApiResponses()
     public ResponseEntity<Page<GetUsersResponseDTO>> getUsers(
@@ -53,6 +56,7 @@ public class AdminPanelController {
 
     @GetMapping("/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Get User by ID", description = "")
     @ApiResponses()
     public ResponseEntity<GetUserDetailsWithHistoryResponseDTO> getUserDetails(
@@ -65,6 +69,7 @@ public class AdminPanelController {
 
     @PatchMapping("/users/{userId}/role")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Change User Role by ID", description = "")
     @ApiResponses()
     public ResponseEntity<Void> changeUserRole(
@@ -80,6 +85,7 @@ public class AdminPanelController {
 
     @PatchMapping("/users/{userId}/active")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Activate User Account by ID", description = "")
     @ApiResponses()
     public ResponseEntity<Void> activeUserAccount(
@@ -93,6 +99,7 @@ public class AdminPanelController {
 
     @PatchMapping("/users/{userId}/disable")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Disable User Account by ID", description = "")
     @ApiResponses()
     public ResponseEntity<Void> disableUserAccount(
@@ -106,6 +113,7 @@ public class AdminPanelController {
 
     @GetMapping("/products/low-stock")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Get Low Stock Products", description = "")
     @ApiResponses()
     public ResponseEntity<Page<GetAllLowStockProductsDTO>> lowStockProducts(
@@ -119,6 +127,7 @@ public class AdminPanelController {
 
     @GetMapping("/reports/sales")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Get Total Revenue", description = "")
     @ApiResponses()
     public ResponseEntity<SalesReportDTO> getSalesReport(
