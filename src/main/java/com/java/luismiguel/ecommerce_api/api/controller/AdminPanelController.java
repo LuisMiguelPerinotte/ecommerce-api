@@ -2,6 +2,7 @@ package com.java.luismiguel.ecommerce_api.api.controller;
 
 import com.java.luismiguel.ecommerce_api.api.dto.admin.request.ChangeUserRoleRequestDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.admin.response.*;
+import com.java.luismiguel.ecommerce_api.application.admin.AdminDashboardService;
 import com.java.luismiguel.ecommerce_api.application.admin.AdminService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -20,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,9 +29,11 @@ import java.util.UUID;
 @Tag(name = "Admin Panel", description = "")
 public class AdminPanelController {
     private final AdminService adminService;
+    private final AdminDashboardService adminDashboardService;
 
-    public AdminPanelController(AdminService adminService) {
+    public AdminPanelController(AdminService adminService, AdminDashboardService adminDashboardService) {
         this.adminService = adminService;
+        this.adminDashboardService = adminDashboardService;
     }
 
     @GetMapping("/dashboard")
@@ -38,7 +42,7 @@ public class AdminPanelController {
     @Operation(summary = "Get Admin Dashboard", description = "")
     @ApiResponses()
     public ResponseEntity<DashboardResponseDTO> dashboard() {
-        return new ResponseEntity<>(adminService.getDashboard(), HttpStatus.OK);
+        return new ResponseEntity<>(adminDashboardService.getDashboard(), HttpStatus.OK);
     }
 
 
@@ -89,7 +93,6 @@ public class AdminPanelController {
     @Operation(summary = "Activate User Account by ID", description = "")
     @ApiResponses()
     public ResponseEntity<Void> activeUserAccount(
-            @Valid
             @PathVariable UUID userId
     ) {
         adminService.activeUserAccount(userId);
@@ -103,7 +106,6 @@ public class AdminPanelController {
     @Operation(summary = "Disable User Account by ID", description = "")
     @ApiResponses()
     public ResponseEntity<Void> disableUserAccount(
-            @Valid
             @PathVariable UUID userId
     ) {
         adminService.disableUserAccount(userId);
@@ -116,12 +118,10 @@ public class AdminPanelController {
     @RateLimiter(name = "admin-endpoints")
     @Operation(summary = "Get Low Stock Products", description = "")
     @ApiResponses()
-    public ResponseEntity<Page<GetAllLowStockProductsDTO>> lowStockProducts(
-            @Valid
-            @RequestParam(defaultValue = "10") Integer threshold,
-            @PageableDefault Pageable pageable
+    public ResponseEntity<List<GetAllLowStockProductsDTO>> lowStockProducts(
+            @RequestParam(defaultValue = "10") Integer threshold
     ) {
-        return new ResponseEntity<>(adminService.getLowStockProducts(threshold, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(adminService.getLowStockProducts(threshold), HttpStatus.OK);
     }
 
 
