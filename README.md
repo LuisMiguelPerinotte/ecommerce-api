@@ -33,7 +33,7 @@ This project aims to:
 | Order processing               | Implemented | Place orders, order history                      |
 | Payment integration            | Implemented | Mercado Pago gateway integration                 |
 | Address management             | Implemented | Manage shipping addresses                        |
-| Admin panel                    | Planned     | Admin endpoints for managing catalog/users       |
+| Admin panel                    | In Progress | Admin endpoints for managing catalog/users       |
 | API documentation (Swagger)    | In Progress | Interactive API docs with Springdoc/OpenAPI      |
 | Automated tests                | In Progress | Unit and integration tests                       |
 
