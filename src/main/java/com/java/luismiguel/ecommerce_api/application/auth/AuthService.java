@@ -82,6 +82,10 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
             User user = (User) authentication.getPrincipal();
+            if (!user.getActive()){
+                throw new UserAccountDeactivateException();
+            }
+
             String accessToken = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
 
@@ -106,6 +110,11 @@ public class AuthService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
+
+        if (!user.getActive()) {
+            refreshTokenService.deleteRefreshToken(user.getUserId());
+            throw new UserAccountDeactivateException();
+        }
 
         if (!refreshTokenService.isValid(user.getUserId(), refreshRequestDTO.refreshToken())) {
             throw new InvalidRefreshTokenException();
