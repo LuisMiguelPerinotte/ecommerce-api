@@ -8,3 +8,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-local
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_DB_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+    ports:
+      - "5432:5432"
