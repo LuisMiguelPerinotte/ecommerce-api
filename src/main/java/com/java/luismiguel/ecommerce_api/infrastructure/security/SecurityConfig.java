@@ -38,8 +38,7 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .requestMatchers("/categories/**").permitAll()
-                        .requestMatchers("/admin/categories/**").hasRole("ADMIN")
-                        .requestMatchers("/admin/products/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/products/**").permitAll()
                         .requestMatchers("/payments/webhook").permitAll()
                         .requestMatchers(
