@@ -25,15 +25,17 @@ spring:
       admin_email: ${ADMIN_EMAIL}
       admin_password: ${ADMIN_PASSWORD}
 
-  mercadopago:
-    access-token: ${MP_ACCESS_TOKEN}
-    webhook-secret: ${MP_WEBHOOK_SECRET}
-    notification-url: ${MP_NOTIFICATION_URL}
-
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+stripe:
+  api:
+    key: ${STRIPE_API_KEY}
+
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
 
 resilience4j:
   ratelimiter:
