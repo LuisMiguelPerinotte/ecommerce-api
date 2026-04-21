@@ -25,17 +25,17 @@ This project aims to:
 ---
 
 ## Features
-| Feature                        | Status      | Description                                      |
-|------------------------------- |-------------|-------------------------------------------------|
-| User registration/login        | Implemented | JWT-based authentication and authorization       |
-| Product management             | Implemented | CRUD for products and categories                 |
-| Shopping cart                  | Implemented | Add/remove/update items, view cart               |
-| Order processing               | Implemented | Place orders, order history                      |
-| Payment integration            | Implemented | Mercado Pago gateway integration                 |
-| Address management             | Implemented | Manage shipping addresses                        |
-| Admin panel                    | In Progress | Admin endpoints for managing catalog/users       |
-| API documentation (Swagger)    | In Progress | Interactive API docs with Springdoc/OpenAPI      |
-| Automated tests                | In Progress | Unit and integration tests                       |
+| Feature                        | Status      | Description                                 |
+|------------------------------- |-------------|---------------------------------------------|
+| User registration/login        | Implemented | JWT-based authentication and authorization  |
+| Product management             | Implemented | CRUD for products and categories            |
+| Shopping cart                  | Implemented | Add/remove/update items, view cart          |
+| Order processing               | Implemented | Place orders, order history                 |
+| Payment integration            | In Progress | Stripe gateway integration                  |
+| Address management             | Implemented | Manage shipping addresses                   |
+| Admin panel                    | Implemented | Admin endpoints for managing catalog/users  |
+| API documentation (Swagger)    | In Progress | Interactive API docs with Springdoc/OpenAPI |
+| Automated tests                | In Progress | Unit and integration tests                  |
 
 ---
 
@@ -79,7 +79,7 @@ Key variables in `.env.example` (already present in the repo):
 - `POSTGRES_DB_USER`, `POSTGRES_DB_PASSWORD` — database credentials.
 - `JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION` — used by the JWT implementation (keep `JWT_SECRET` secret in production).
 - `REDIS_HOST`, `REDIS_PORT` — connection for Redis (used for caches/sessions). Default in the `.env.example` points to a `redis` host used by Docker Compose.
-- `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`, `MP_NOTIFICATION_URL` — Mercado Pago credentials and webhook config.
+- `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET` — Stripe credential and webhook secret.
 
 How `application.yml` maps these variables (see `src/main/resources/application.yml`):
 ```yaml
@@ -96,10 +96,13 @@ spring:
     placeholders:
       admin_email: ${ADMIN_EMAIL}
       admin_password: ${ADMIN_PASSWORD}
-  mercadopago:
-    access-token: ${MP_ACCESS_TOKEN}
-    webhook-secret: ${MP_WEBHOOK_SECRET}
-    notification-url: ${MP_NOTIFICATION_URL}
+
+stripe:
+  api:
+    key: ${STRIPE_API_KEY}
+
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
 
 jwt:
   secret: ${JWT_SECRET}
@@ -224,8 +227,8 @@ Please include clear descriptions, tests for new logic, and keep commits atomic.
 **Q: Can I use another database?**
 A: Yes — the app uses Spring Data JPA with Postgres. Configure `POSTGRES_DB_URL` and credentials to point to your host.
 
-**Q: How do I get a Mercado Pago access token?**
-A: Register at [Mercado Pago Developers](https://www.mercadopago.com.br/developers/) and create an app to get your credentials. Put them in `MP_ACCESS_TOKEN` and related env vars.
+**Q: How do I get a Stripe Api Key?**
+A: Register at [Stripe](https://stripe.com/br) and create an app to get your credentials. Put them in `STRIPE_API_KEY` and related env vars.
 
 **Q: Where can I change JWT settings?**
 A: In your environment variables (`JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION`) or override them in `application.yml` for each profile.
