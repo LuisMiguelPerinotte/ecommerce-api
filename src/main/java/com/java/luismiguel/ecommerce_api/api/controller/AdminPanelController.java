@@ -3,7 +3,7 @@ package com.java.luismiguel.ecommerce_api.api.controller;
 import com.java.luismiguel.ecommerce_api.api.dto.admin.request.ChangeUserRoleRequestDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.admin.response.*;
 import com.java.luismiguel.ecommerce_api.application.admin.AdminDashboardService;
-import com.java.luismiguel.ecommerce_api.application.admin.AdminService;
+import com.java.luismiguel.ecommerce_api.application.admin.AdminPanelService;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,10 +28,10 @@ import java.util.UUID;
 @RequestMapping("/admin")
 @Tag(name = "Admin Panel", description = "")
 public class AdminPanelController {
-    private final AdminService adminService;
+    private final AdminPanelService adminService;
     private final AdminDashboardService adminDashboardService;
 
-    public AdminPanelController(AdminService adminService, AdminDashboardService adminDashboardService) {
+    public AdminPanelController(AdminPanelService adminService, AdminDashboardService adminDashboardService) {
         this.adminService = adminService;
         this.adminDashboardService = adminDashboardService;
     }
