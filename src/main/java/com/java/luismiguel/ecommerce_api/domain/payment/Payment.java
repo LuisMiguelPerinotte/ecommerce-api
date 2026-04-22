@@ -5,7 +5,6 @@ import com.java.luismiguel.ecommerce_api.domain.payment.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,31 +22,36 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID paymentId;
 
-    @OneToOne
-    @JoinColumn(name = "order_id")
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
     Order order;
 
-    @Column(name = "mp_preference_id", nullable = false)
-    String mpPreferenceId;
+    @Column(name = "stripe_session_id", unique = true)
+    String stripeSessionId;
 
-    @Column(name = "mp_payment_id")
-    String mpPaymentId;
+    @Column(name = "payment_intent_id", unique = true)
+    String paymentIntentId;
 
-    @Column(name = "external_reference", nullable = false)
-    String externalReference;
+    @Column(name = "amount", nullable = false)
+    BigDecimal amount;
+
+    @Column(name = "currency")
+    String currency;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)
     PaymentStatus status;
 
-    @Column(name = "amount", nullable = false)
-    BigDecimal amount;
+    @Column(name = "failure_reason")
+    String failureReason;
+
+    @Column(name = "paid_at")
+    LocalDateTime paidAt;
+
+    @Column(name = "failed_at")
+    LocalDateTime failedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    LocalDateTime updatedAt;
 }
