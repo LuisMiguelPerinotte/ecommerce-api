@@ -31,7 +31,7 @@ This project aims to:
 | Product management             | Implemented | CRUD for products and categories            |
 | Shopping cart                  | Implemented | Add/remove/update items, view cart          |
 | Order processing               | Implemented | Place orders, order history                 |
-| Payment integration            | In Progress | Stripe gateway integration                  |
+| Payment integration            | Implemented | Stripe gateway integration                  |
 | Address management             | Implemented | Manage shipping addresses                   |
 | Admin panel                    | Implemented | Admin endpoints for managing catalog/users  |
 | API documentation (Swagger)    | In Progress | Interactive API docs with Springdoc/OpenAPI |
