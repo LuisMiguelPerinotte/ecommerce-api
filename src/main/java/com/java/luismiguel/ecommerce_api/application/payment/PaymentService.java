@@ -2,6 +2,7 @@ package com.java.luismiguel.ecommerce_api.application.payment;
 
 import com.java.luismiguel.ecommerce_api.api.dto.payment.response.CheckoutResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.order.Order;
+import com.java.luismiguel.ecommerce_api.domain.order.OrderItem;
 import com.java.luismiguel.ecommerce_api.domain.order.OrderRepository;
 import com.java.luismiguel.ecommerce_api.domain.order.enums.OrderStatus;
 import com.java.luismiguel.ecommerce_api.domain.payment.Payment;
@@ -9,191 +10,251 @@ import com.java.luismiguel.ecommerce_api.domain.payment.PaymentRepository;
 import com.java.luismiguel.ecommerce_api.domain.payment.enums.PaymentStatus;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.order.OrderNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.payment.*;
-import com.mercadopago.client.payment.PaymentClient;
-import com.mercadopago.client.preference.PreferenceClient;
-import com.mercadopago.client.preference.PreferenceItemRequest;
-import com.mercadopago.client.preference.PreferenceRequest;
-import com.mercadopago.exceptions.MPApiException;
-import com.mercadopago.exceptions.MPException;
-import com.mercadopago.resources.preference.Preference;
+import com.stripe.exception.EventDataObjectDeserializationException;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
+import com.stripe.model.PaymentIntent;
+import com.stripe.model.StripeObject;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.util.HexFormat;
-import java.util.List;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
 public class PaymentService {
-    private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final PaymentPersistenceService paymentPersistenceService;
+    private final PaymentRepository paymentRepository;
 
-    @Value("${spring.mercadopago.webhook-secret}")
-    private String webhookSecret;
+    private static final Set<OrderStatus> PAYABLE_STATUSES = Set.of(OrderStatus.PENDING, OrderStatus.PAYMENT_FAILED);
+    private static final Set<PaymentStatus> EXPIRATION_STATUSES = Set.of(PaymentStatus.CREATED, PaymentStatus.FAILED);
 
-    @Value("${spring.mercadopago.notification-url}")
-    private String mpNotificationUrl;
-
-    public PaymentService(PaymentRepository paymentRepository, OrderRepository orderRepository) {
-        this.paymentRepository = paymentRepository;
+    public PaymentService(OrderRepository orderRepository, PaymentPersistenceService paymentPersistenceService, PaymentRepository paymentRepository) {
         this.orderRepository = orderRepository;
+        this.paymentPersistenceService = paymentPersistenceService;
+        this.paymentRepository = paymentRepository;
     }
 
-
-    @Transactional
     public CheckoutResponseDTO createCheckout(UUID orderId, UUID userId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(OrderNotFoundException::new);
 
-        if (!order.getUser().getUserId().equals(userId)) {
+        if (!userId.equals(order.getUser().getUserId())) {
             throw new OrderNotFoundException();
         }
 
-        PreferenceItemRequest item = PreferenceItemRequest.builder()
-                .title("Pedido #" + orderId)
-                .quantity(1)
-                .unitPrice(order.getTotalAmount())
-                .build();
+        Boolean exists = paymentRepository.existsByOrderAndStatus(order, PaymentStatus.CREATED);
+        if (exists) {
+            throw new PaymentIsAlreadyInProgressException();
+        }
 
-        PreferenceRequest preferenceRequest = PreferenceRequest.builder()
-                .items(List.of(item))
-                .externalReference(orderId.toString())
-                .notificationUrl(mpNotificationUrl)
-                .build();
+        if (!PAYABLE_STATUSES.contains(order.getOrderStatus())) {
+            throw new OrderCannotBePaidException();
+        }
 
-        PreferenceClient client = new PreferenceClient();
+
+        List<SessionCreateParams.LineItem> items = createLineItemList(order);
+
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setClientReferenceId(orderId.toString())
+                        .setPaymentIntentData(
+                                SessionCreateParams.PaymentIntentData.builder()
+                                        .putMetadata("orderId", orderId.toString())
+                                        .build()
+                        )
+                        .addAllLineItem(items)
+                        .setSuccessUrl("http://localhost:8080/success")
+                        .setCancelUrl("http://localhost:8080/cancel")
+                        .addExpand("payment_intent")
+                        .build();
 
         try {
-            Preference preference = client.create(preferenceRequest);
+            Session session = Session.create(params);
             Payment payment = Payment.builder()
+                    .stripeSessionId(session.getId())
                     .order(order)
-                    .mpPreferenceId(preference.getId())
-                    .externalReference(orderId.toString())
                     .status(PaymentStatus.CREATED)
                     .amount(order.getTotalAmount())
+                    .currency("brl")
                     .build();
 
             order.setOrderStatus(OrderStatus.AWAITING_PAYMENT);
-            orderRepository.save(order);
-            paymentRepository.save(payment);
-            return new CheckoutResponseDTO(preference.getInitPoint());
+            paymentPersistenceService.savePaymentAndOrder(payment, order);
+            log.info("Created Checkout: orderId -> {} sessionId -> {}", orderId, session.getId());
 
-        } catch (MPApiException | MPException e) {
-            throw new ErrorCreatingPreferenceException();
+            return new CheckoutResponseDTO(
+                    session.getUrl()
+            );
+
+        } catch (StripeException e) {
+            log.info("Error Creating Checkout for Order ID: {}", orderId);
+            throw new ErrorCreatingCheckoutException();
         }
     }
 
 
-    @Async
+    private List<SessionCreateParams.LineItem> createLineItemList(Order order) {
+        List<SessionCreateParams.LineItem> items = new ArrayList<>();
+
+        for (OrderItem item : order.getItems()) {
+            Long productQuantity = item.getQuantity().longValue();
+            String productName = item.getProductName();
+            Long unitAmount = item.getUnitPrice()
+                    .multiply(new BigDecimal("100"))
+                    .setScale(0, RoundingMode.HALF_UP)
+                    .longValue();
+
+
+            SessionCreateParams.LineItem.PriceData.ProductData productData =
+                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                            .setName(productName)
+                            .build();
+
+            SessionCreateParams.LineItem.PriceData priceData =
+                    SessionCreateParams.LineItem.PriceData.builder()
+                            .setCurrency("brl")
+                            .setUnitAmount(unitAmount)
+                            .setProductData(productData)
+                            .build();
+
+            SessionCreateParams.LineItem lineItem =
+                    SessionCreateParams
+                            .LineItem.builder()
+                            .setQuantity(productQuantity)
+                            .setPriceData(priceData)
+                            .build();
+
+            items.add(lineItem);
+        }
+        return items;
+    }
+
+
     @Transactional
-    public void processWebhook(String type, String paymentId, String signature, String requestId) {
-        log.info("Webhook Received - type: {}, paymentId: {}", type, paymentId);
+    public void processCheckoutCompleted(Event event) {
+        StripeObject stripeObject = deserializeObject(event);
 
-        if (!type.equals("payment")) {
-            return;
+        if (stripeObject instanceof Session session) {
+            if ("paid".equals(session.getPaymentStatus())) {
+                Optional<Payment> optionalPayment = paymentRepository.findByStripeSessionIdWithOrder(session.getId());
+                if (optionalPayment.isEmpty()) {
+                    log.warn("Payment not found...");
+                    return;
+                }
+
+                Payment payment = optionalPayment.get();
+
+                if (PaymentStatus.APPROVED.equals(payment.getStatus())) {
+                    log.info("Payment (Payment ID: {}) is Already Processed, Ignoring...", payment.getPaymentId());
+                    return;
+                }
+
+                Order order = payment.getOrder();
+
+                payment.setStatus(PaymentStatus.APPROVED);
+                payment.setPaidAt(LocalDateTime.now());
+                order.setOrderStatus(OrderStatus.PAID);
+
+                paymentRepository.save(payment);
+                orderRepository.save(order);
+                log.info("Approved Payment: paymentId -> {} orderId -> {}", payment.getPaymentId(), order.getOrderId());
+            }
         }
+    }
 
-        if (paymentId.equals("123456")) {
-            log.info("Test Webhook {} Received, Ignoring...", paymentId);
-            return;
-        }
+    @Transactional
+    public void processPaymentFailed(Event event) {
+        StripeObject stripeObject = deserializeObject(event);
 
-        verifySignature(paymentId, requestId, signature);
-
-        if (paymentRepository.existsByMpPaymentId(paymentId)) {
-            log.info("Payment {} is Already Processed, Ignoring Webhook...", paymentId);
-            return;
-        }
-
-
-        try{
-            PaymentClient client = new PaymentClient();
-            com.mercadopago.resources.payment.Payment mpPayment = client.get(Long.parseLong(paymentId));
-
-            UUID orderId = UUID.fromString(mpPayment.getExternalReference());
-
-            Order order = orderRepository.findById(orderId)
-                    .orElseThrow(OrderNotFoundException::new);
-
-            if (mpPayment.getTransactionAmount().compareTo(order.getTotalAmount()) != 0) {
-                log.warn("Amount mismatch for order {}!", orderId);
+        if (stripeObject instanceof PaymentIntent paymentIntent) {
+            String orderId = paymentIntent.getMetadata().get("orderId");
+            if (orderId.isEmpty()) {
+                log.warn("orderId was not included in the metadata.");
                 return;
             }
 
-            if (order.getOrderStatus() != OrderStatus.AWAITING_PAYMENT) {
-                log.info("Order {} Not in AWAITING_PAYMENT Status, Ignoring...", orderId);
+            Optional<Payment> optionalPayment = paymentRepository.findPaymentByOrderIdAndStatusWithOrder(UUID.fromString(orderId), PaymentStatus.CREATED);
+            if (optionalPayment.isEmpty()) {
+                log.warn("payment with orderId -> {} not found...", orderId);
                 return;
             }
 
-            Payment payment = paymentRepository.findByOrder(order)
-                    .orElseThrow(PaymentNotFoundException::new);
+            Payment payment = optionalPayment.get();
+            Order order = payment.getOrder();
 
-            if (payment.getStatus() == PaymentStatus.APPROVED ||
-                    payment.getStatus() == PaymentStatus.REJECTED ||
-                    payment.getStatus() == PaymentStatus.REFUNDED
-            ) {
-                log.info("Payment {} is Already Processed, Ignoring Webhook...", paymentId);
+            if (payment.getStatus() != PaymentStatus.CREATED) {
+                log.info("payment (id -> {}) without the status CREATED. Ignoring...", payment.getPaymentId());
                 return;
             }
 
-            log.info("Payment Status: {}", mpPayment.getStatus());
+            String failureReason = paymentIntent.getLastPaymentError().getDeclineCode();
+            if (failureReason == null) failureReason = "unknown";
 
-            switch (mpPayment.getStatus()) {
-                case "approved" -> {
-                    order.setOrderStatus(OrderStatus.PAID);
-                    payment.setStatus(PaymentStatus.APPROVED);
-                    payment.setMpPaymentId(paymentId);
-                }
-                case "rejected", "cancelled" -> {
-                    order.setOrderStatus(OrderStatus.CANCELLED);
-                    payment.setStatus(PaymentStatus.REJECTED);
-                }
-                case "refunded" -> {
-                    order.setOrderStatus(OrderStatus.REFUNDED);
-                    payment.setStatus(PaymentStatus.REFUNDED);
-                }
-                case "in_process", "pending" -> {
-                   payment.setStatus(PaymentStatus.PENDING);
-                   log.info("Pending Payment to Order {}",  order.getOrderId());
-                }
-            }
+            payment.setStatus(PaymentStatus.FAILED);
+            payment.setFailedAt(LocalDateTime.now());
+            payment.setFailureReason(failureReason);
 
-            orderRepository.save(order);
             paymentRepository.save(payment);
+            orderRepository.save(order);
+            log.info("Payment Failed: paymentId -> {} orderId -> {} failureReason -> {}",
+                    payment.getPaymentId(), order.getOrderId(), failureReason);
+        }
+    }
 
-            log.info("Updated {} Order for {}", order.getOrderId(), order.getOrderStatus());
+    @Transactional
+    public void processPaymentExpired(Event event) {
+        StripeObject stripeObject = deserializeObject(event);
 
-        } catch (MPApiException | MPException e) {
-            log.error("Error processing webhook for paymentId: {}", paymentId, e);;
+        if (stripeObject instanceof Session session) {
+            Optional<Payment> optionalPayment = paymentRepository.findByStripeSessionIdWithOrder(session.getId());
+            if (optionalPayment.isEmpty()) {
+                log.warn("payment not found...");
+                return;
+            }
+
+            Payment payment = optionalPayment.get();
+            Order order = payment.getOrder();
+
+
+            if (!EXPIRATION_STATUSES.contains(payment.getStatus())) {
+                log.info("expired payment (id -> {}) without the status CREATED or FAILED. Ignoring...", payment.getPaymentId());
+                return;
+            }
+
+            payment.setStatus(PaymentStatus.EXPIRED);
+            payment.setFailedAt(LocalDateTime.now());
+            order.setOrderStatus(OrderStatus.PAYMENT_FAILED);
+
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+            log.info("expired payment: paymentId -> {} orderId -> {} sessionId -> {}", payment.getPaymentId(), order.getOrderId(), session.getId());
         }
     }
 
 
-    //Private Methods
-    private void verifySignature(String dataId, String requestId, String xSignature) {
-        try {
-            String[] parts = xSignature.split(",");
-            String ts = parts[0].split("=")[1];
-            String v1 = parts[1].split("=")[1];
+    private StripeObject deserializeObject(Event event) {
+        StripeObject stripeObject = null;
+        Optional<StripeObject> optionalStripeObject = event.getDataObjectDeserializer().getObject();
 
-            String manifest = "id:" + dataId + ";request-id:" + requestId + ";ts:" + ts + ";";
+        if (optionalStripeObject.isPresent()) {
+            stripeObject = optionalStripeObject.get();
+        } else {
+            try {
+                stripeObject = event.getDataObjectDeserializer().deserializeUnsafe();
 
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(webhookSecret.getBytes(), "HmacSHA256"));
-            String generated = HexFormat.of().formatHex(mac.doFinal(manifest.getBytes()));
-
-            if (!generated.equals(v1)) {
-                throw new InvalidWebhookSignatureException();
+            } catch (EventDataObjectDeserializationException e) {
+                throw new ErrorOnTheObjectDeserializationException();
             }
-
-        } catch (Exception e) {
-            throw new InvalidWebhookSignatureException();
         }
+        return stripeObject;
     }
 }
