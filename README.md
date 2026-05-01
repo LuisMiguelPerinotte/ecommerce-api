@@ -1,8 +1,9 @@
 # 🛒 E-Commerce API
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/your-username/your-ecommerce-api-repo/actions)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions)
+[![Java](https://img.shields.io/badge/Java-21-blue)](https://adoptopenjdk.net/)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://adoptopenjdk.net/)
 
 ---
 
@@ -169,7 +170,7 @@ If the UI doesn't appear, check the `springdoc` configuration and application lo
 ## Getting Started
 
 ### Pre-requisites
-- Java 17 or higher
+- Java 21
 - Maven
 - Docker (optional)
 
