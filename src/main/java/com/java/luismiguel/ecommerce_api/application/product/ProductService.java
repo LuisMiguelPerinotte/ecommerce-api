@@ -140,19 +140,6 @@ public class ProductService {
     }
 
 
-    public void softDeleteProduct(UUID id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(ProductNotFoundException::new);
-
-        if (!product.getActive()) {
-            throw new ProductNotFoundException();
-        }
-
-        product.setActive(Boolean.FALSE);
-        productRepository.save(product);
-    }
-
-
     public void activateProduct(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(ProductNotFoundException::new);

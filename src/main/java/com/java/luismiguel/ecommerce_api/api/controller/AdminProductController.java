@@ -88,21 +88,6 @@ public class AdminProductController {
     }
 
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @RateLimiter(name = "critical")
-    @Operation(summary = "Soft Delete Product", description = "Soft delete a product, marking it inactive. Requires ADMIN privileges.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Product soft-deleted (no content)"),
-            @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
-    })
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-        productService.softDeleteProduct(id);
-        return ResponseEntity.noContent().build();
-    }
-
-
     @PatchMapping("/{id}/activate")
     @PreAuthorize("hasRole('ADMIN')")
     @RateLimiter(name = "create-resource")
