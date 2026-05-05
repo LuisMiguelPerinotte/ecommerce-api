@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -85,8 +86,8 @@ class AuthServiceTest {
 
             UserResponseDTO result = authService.registerNewUser(requestDTO);
 
-            Assertions.assertNotNull(result.userId());
-            Assertions.assertEquals(requestDTO.username(), result.username());
+            assertThat(result.userId()).isNotNull();
+            assertThat(result.username()).isEqualTo(requestDTO.username());
             verify(userRepository, times(1)).save(any(User.class));
         }
 
@@ -96,7 +97,7 @@ class AuthServiceTest {
         void shouldThrowExceptionWhenUserEmailAlreadyRegistered() {
             when(userRepository.save(any(User.class))).thenThrow(new DataIntegrityViolationException(""));
 
-            Assertions.assertThrows(UserEmailAlreadyRegisteredException.class, () -> {
+            assertThrows(UserEmailAlreadyRegisteredException.class, () -> {
                 authService.registerNewUser(requestDTO);
             });
         }
@@ -128,7 +129,7 @@ class AuthServiceTest {
             given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .willReturn(authMock);
 
-            Assertions.assertThrows(UserAccountDeactivateException.class, () -> {
+            assertThrows(UserAccountDeactivateException.class, () -> {
                 authService.userLogin(requestDTO);
             });
         }
@@ -140,7 +141,7 @@ class AuthServiceTest {
             given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .willThrow(new BadCredentialsException("Invalid username or password"));
 
-            Assertions.assertThrows(InvalidCredentialsException.class, () -> {
+            assertThrows(InvalidCredentialsException.class, () -> {
                 authService.userLogin(requestDTO);
             });
         }
@@ -203,7 +204,7 @@ class AuthServiceTest {
         void shouldThrowExceptionWhenUserNotFound() {
             given(userRepository.findByEmail(email)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(UserNotFoundException.class, () -> {
+            assertThrows(UserNotFoundException.class, () -> {
                 authService.refreshToken(requestDTO);
             });
         }
@@ -219,7 +220,7 @@ class AuthServiceTest {
 
             given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
 
-            Assertions.assertThrows(UserAccountDeactivateException.class, () -> {
+            assertThrows(UserAccountDeactivateException.class, () -> {
                 authService.refreshToken(requestDTO);
             });
 
@@ -239,7 +240,7 @@ class AuthServiceTest {
             given(refreshTokenService.isValid(user.getUserId(), requestDTO.refreshToken()))
                     .willReturn(false);
 
-            Assertions.assertThrows(InvalidRefreshTokenException.class, () -> {
+            assertThrows(InvalidRefreshTokenException.class, () -> {
                 authService.refreshToken(requestDTO);
             });
         }
@@ -330,7 +331,7 @@ class AuthServiceTest {
         void shouldThrowExceptionWhenUserNotFound() {
             given(userRepository.findByEmail(email)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(UserNotFoundException.class, () -> {
+            assertThrows(UserNotFoundException.class, () -> {
                 authService.changePassword(requestDTO, email);
             });
         }
@@ -346,7 +347,7 @@ class AuthServiceTest {
             given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
             given(passwordEncoder.matches(requestDTO.currentPassword(), user.getPassword())).willReturn(false);
 
-            Assertions.assertThrows(InvalidPasswordException.class, () -> {
+            assertThrows(InvalidPasswordException.class, () -> {
                 authService.changePassword(requestDTO, email);
             });
         }
@@ -363,7 +364,7 @@ class AuthServiceTest {
             given(passwordEncoder.matches(requestDTO.currentPassword(), user.getPassword())).willReturn(true);
             given(passwordEncoder.matches(requestDTO.newPassword(), user.getPassword())).willReturn(true);
 
-            Assertions.assertThrows(PasswordUnchangedException.class, () -> {
+            assertThrows(PasswordUnchangedException.class, () -> {
                 authService.changePassword(requestDTO, email);
             });
         }
@@ -412,7 +413,7 @@ class AuthServiceTest {
         void shouldThrowExceptionWhenUserNotFound() {
             given(userRepository.findByEmail(email)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(UserNotFoundException.class, () -> {
+            assertThrows(UserNotFoundException.class, () -> {
                 authService.logout(email, accessToken);
             });
         }

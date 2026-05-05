@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -165,7 +166,7 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(ProductNotFoundException.class, () -> {
+            assertThrows(ProductNotFoundException.class, () -> {
                 cartService.addCartItem(addCartItemRequestDTO, userId);
             });
         }
@@ -182,7 +183,7 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            Assertions.assertThrows(ProductNotFoundException.class, () -> {
+            assertThrows(ProductNotFoundException.class, () -> {
                 cartService.addCartItem(addCartItemRequestDTO, userId);
             });
         }
@@ -199,7 +200,7 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            Assertions.assertThrows(InsufficientProductStockException.class, () -> {
+            assertThrows(InsufficientProductStockException.class, () -> {
                 cartService.addCartItem(addCartItemRequestDTO, userId);
             });
         }
@@ -236,7 +237,7 @@ public class CartServiceTest {
 
             AddedCartItemDTO result = cartService.addCartItem(addCartItemRequestDTO, userId);
 
-            Assertions.assertEquals(2, result.quantity());
+            assertThat(result.quantity()).isEqualTo(2);
         }
 
 
@@ -263,7 +264,7 @@ public class CartServiceTest {
 
             AddedCartItemDTO result = cartService.addCartItem(addCartItemRequestDTO, userId);
 
-            Assertions.assertEquals(1, result.quantity());
+            assertThat(result.quantity()).isEqualTo(1);
         }
     }
 
@@ -286,7 +287,7 @@ public class CartServiceTest {
 
             given(cartItemRepository.findById(cartItemId)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(CartItemNotFoundException.class, () -> {
+            assertThrows(CartItemNotFoundException.class, () -> {
                 cartService.updateCartItemQuantity(requestDTO, cartItemId);
             });
         }
@@ -330,7 +331,7 @@ public class CartServiceTest {
 
             given(cartItemRepository.findById(cartItemId)).willReturn(Optional.of(cartItem));
 
-            Assertions.assertThrows(InsufficientProductStockException.class, () -> {
+            assertThrows(InsufficientProductStockException.class, () -> {
                 cartService.updateCartItemQuantity(requestDTO, cartItemId);
             });
         }
@@ -380,7 +381,7 @@ public class CartServiceTest {
         void shouldThrowExceptionWhenCartItemNotFound() {
             given(cartItemRepository.existsById(itemId)).willReturn(false);
 
-            Assertions.assertThrows(CartItemNotFoundException.class, () -> {
+            assertThrows(CartItemNotFoundException.class, () -> {
                 cartService.removeCartItem(itemId);
             });
         }
@@ -418,7 +419,7 @@ public class CartServiceTest {
 
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
 
-            Assertions.assertThrows(CartIsEmptyException.class, () -> {
+            assertThrows(CartIsEmptyException.class, () -> {
                 cartService.cleanCart(userId);
             });
         }

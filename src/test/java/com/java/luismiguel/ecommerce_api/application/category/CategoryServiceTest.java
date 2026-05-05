@@ -22,10 +22,11 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
@@ -67,15 +68,15 @@ public class CategoryServiceTest {
 
             Page<GetAllActiveCategoriesDTO> result = categoryService.getAllCategories(pageable);
 
-            Assertions.assertEquals(1, result.getTotalElements());
-            Assertions.assertEquals(1, result.getContent().size());
+            assertThat(result.getTotalElements()).isEqualTo(1);
+            assertThat(result.getContent()).hasSize(1);
 
             GetAllActiveCategoriesDTO dto = result.getContent().getFirst();
 
-            Assertions.assertEquals(categoryId, dto.categoryId());
-            Assertions.assertEquals(name, dto.name());
-            Assertions.assertEquals(slug, dto.slug());
-            Assertions.assertEquals(createdAt, dto.createdAt());
+            assertThat(dto.categoryId()).isEqualTo(categoryId);
+            assertThat(dto.name()).isEqualTo(name);
+            assertThat(dto.slug()).isEqualTo(slug);
+            assertThat(dto.createdAt()).isEqualTo(createdAt);
         }
     }
 
@@ -95,7 +96,7 @@ public class CategoryServiceTest {
         void shouldThrowExceptionWhenCategoryNotFound() {
             given(categoryRepository.findById(categoryId)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(CategoryNotFoundException.class, () -> {
+            assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.getCategoryById(categoryId);
             });
         }
@@ -110,7 +111,7 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
-            Assertions.assertThrows(CategoryNotFoundException.class, () -> {
+            assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.getCategoryById(categoryId);
             });
         }
@@ -137,12 +138,12 @@ public class CategoryServiceTest {
 
             GetCategoryResponseDTO result = categoryService.getCategoryById(categoryId);
 
-            Assertions.assertEquals(categoryId, result.categoryId());
-            Assertions.assertEquals(name, result.name());
-            Assertions.assertEquals(description, result.description());
-            Assertions.assertEquals(slug, result.slug());
-            Assertions.assertEquals(true, result.active());
-            Assertions.assertEquals(createdAt, result.createdAt());
+            assertThat(result.categoryId()).isEqualTo(categoryId);
+            assertThat(result.name()).isEqualTo(name);
+            assertThat(result.description()).isEqualTo(description);
+            assertThat(result.slug()).isEqualTo(slug);
+            assertThat(result.active()).isTrue();
+            assertThat(result.createdAt()).isEqualTo(createdAt);
         }
     }
 
@@ -162,7 +163,7 @@ public class CategoryServiceTest {
         void shouldThrowExceptionWhenCategoryNotFound() {
             given(categoryRepository.findById(categoryId)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(CategoryNotFoundException.class, () -> {
+            assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.softDeleteCategory(categoryId);
             });
         }
@@ -177,7 +178,7 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
-            Assertions.assertThrows(CategoryNotFoundException.class, () -> {
+            assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.softDeleteCategory(categoryId);
             });
         }
@@ -194,7 +195,7 @@ public class CategoryServiceTest {
 
             categoryService.softDeleteCategory(categoryId);
 
-            Assertions.assertEquals(false, category.getActive());
+            assertThat(category.getActive()).isFalse();
             then(categoryRepository).should().save(category);
         }
     }
@@ -217,7 +218,7 @@ public class CategoryServiceTest {
         void shouldThrowExceptionWhenCategoryNotFound() {
             given(categoryRepository.findById(categoryId)).willReturn(Optional.empty());
 
-            Assertions.assertThrows(CategoryNotFoundException.class, () -> {
+            assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.updateCategory(categoryId, requestDTO);
             });
         }
@@ -232,7 +233,7 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
-            Assertions.assertThrows(CategoryNotFoundException.class, () -> {
+            assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.updateCategory(categoryId, requestDTO);
             });
         }
@@ -255,8 +256,8 @@ public class CategoryServiceTest {
 
             categoryService.updateCategory(categoryId, updateRequestDTO);
 
-            Assertions.assertEquals(category.getName(), updateRequestDTO.name().toLowerCase());
-            Assertions.assertEquals(category.getDescription(), updateRequestDTO.description());
+            assertThat(updateRequestDTO.name().toLowerCase()).isEqualTo(category.getName());
+            assertThat(updateRequestDTO.description()).isEqualTo(category.getDescription());
 
             then(categoryRepository).should().save(category);
         }
@@ -279,7 +280,7 @@ public class CategoryServiceTest {
 
             categoryService.updateCategory(categoryId, updateRequestDTO);
 
-            Assertions.assertEquals(category.getName(), updateRequestDTO.name().toLowerCase());
+            assertThat(updateRequestDTO.name().toLowerCase()).isEqualTo(category.getName());
 
             then(categoryRepository).should().save(category);
         }
@@ -302,7 +303,7 @@ public class CategoryServiceTest {
 
             categoryService.updateCategory(categoryId, updateRequestDTO);
 
-            Assertions.assertEquals(category.getDescription(), updateRequestDTO.description());
+            assertThat(updateRequestDTO.description()).isEqualTo(category.getDescription());
 
             then(categoryRepository).should().save(category);
         }
@@ -337,7 +338,7 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findByName(requestDTO.name())).willReturn(Optional.of(category));
 
-            Assertions.assertThrows(CategoryAlreadyExistsException.class, () -> {
+            assertThrows(CategoryAlreadyExistsException.class, () -> {
                 categoryService.createCategory(requestDTO);
             });
         }
@@ -369,11 +370,11 @@ public class CategoryServiceTest {
 
             CreatedCategoryResponseDTO result = categoryService.createCategory(requestDTO);
 
-            Assertions.assertEquals(categoryName, result.name());
-            Assertions.assertEquals(requestDTO.description(), result.description());
-            Assertions.assertEquals(categorySlug, result.slug());
-            Assertions.assertEquals(true, result.active());
-            Assertions.assertEquals(createdAt, result.createdAt());
+            assertThat(result.name()).isEqualTo(categoryName);
+            assertThat(result.description()).isEqualTo(requestDTO.description());
+            assertThat(result.slug()).isEqualTo(categorySlug);
+            assertThat(result.active()).isTrue();
+            assertThat(result.createdAt()).isEqualTo(createdAt);
         }
 
 
@@ -394,12 +395,12 @@ public class CategoryServiceTest {
 
             CreatedCategoryResponseDTO result = categoryService.createCategory(requestDTO);
 
-            Assertions.assertEquals(categoryId, result.categoryId());
-            Assertions.assertEquals(requestDTO.name(), result.name());
-            Assertions.assertEquals(requestDTO.description(), result.description());
-            Assertions.assertEquals(categorySlug, result.slug());
-            Assertions.assertEquals(true, result.active());
-            Assertions.assertEquals(createdAt, result.createdAt());
+            assertThat(result.categoryId()).isEqualTo(categoryId);
+            assertThat(result.name()).isEqualTo(requestDTO.name());
+            assertThat(result.description()).isEqualTo(requestDTO.description());
+            assertThat(result.slug()).isEqualTo(categorySlug);
+            assertThat(result.active()).isTrue();
+            assertThat(result.createdAt()).isEqualTo(createdAt);
         }
     }
 }
