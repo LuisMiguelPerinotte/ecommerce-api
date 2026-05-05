@@ -177,7 +177,7 @@ If the UI doesn't appear, check the `springdoc` configuration and application lo
 ### Quick start (local dev)
 ```bash
 # Clone
-git clone https://github.com/your-username/your-ecommerce-api-repo.git
+git clone https://github.com/LuisMiguelPerinotte/ecommerce-api.git
 cd ecommerce-api
 
 # Copy env example and edit
