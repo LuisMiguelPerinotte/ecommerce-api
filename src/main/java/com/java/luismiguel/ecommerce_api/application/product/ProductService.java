@@ -119,7 +119,7 @@ public class ProductService {
         Optional.ofNullable(updateProductRequestDTO.categoryId())
                 .ifPresent(categoryId -> {
                     Category category = categoryRepository.findById(categoryId)
-                            .orElseThrow(CategoryAlreadyExistsException::new);
+                            .orElseThrow(CategoryNotFoundException::new);
                     product.setCategory(category);
                 });
 
