@@ -77,8 +77,8 @@ public class ProductService {
                 .orElseThrow(CategoryNotFoundException::new);
 
         Product product = Product.builder()
-                .name(createProductRequestDTO.name())
-                .description(createProductRequestDTO.description())
+                .name(createProductRequestDTO.name().trim())
+                .description(createProductRequestDTO.description().trim())
                 .price(createProductRequestDTO.price())
                 .stockQuantity(createProductRequestDTO.stockQuantity())
                 .active(Boolean.TRUE)
