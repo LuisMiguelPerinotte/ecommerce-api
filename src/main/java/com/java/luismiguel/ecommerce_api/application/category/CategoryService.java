@@ -67,12 +67,12 @@ public class CategoryService {
             }
 
             category.setActive(Boolean.TRUE);
-            category.setDescription(createCategoryRequestDTO.description());
+            category.setDescription(createCategoryRequestDTO.description().trim());
 
         } else {
             category = Category.builder()
                     .name(createCategoryRequestDTO.name().toLowerCase().trim())
-                    .description(createCategoryRequestDTO.description())
+                    .description(createCategoryRequestDTO.description().trim())
                     .slug(toSlug(createCategoryRequestDTO.name()))
                     .active(Boolean.TRUE)
                     .build();
