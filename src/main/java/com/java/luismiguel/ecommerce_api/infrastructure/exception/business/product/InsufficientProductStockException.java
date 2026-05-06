@@ -4,6 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class InsufficientProductStockException extends ProductException {
     public InsufficientProductStockException(String productName) {
-        super("Product '" + productName + " has Insufficient Stock!", HttpStatus.valueOf(422));
+        super("Product " + productName + " has Insufficient Stock!", HttpStatus.valueOf(422));
     }
 }
