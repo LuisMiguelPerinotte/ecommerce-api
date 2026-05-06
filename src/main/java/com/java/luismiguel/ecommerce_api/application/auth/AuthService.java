@@ -75,8 +75,8 @@ public class AuthService {
     public AuthResponseDTO userLogin(LoginRequestDTO loginRequestDTO) {
         try{
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    loginRequestDTO.email(),
-                    loginRequestDTO.password()
+                    loginRequestDTO.email().trim().toLowerCase(),
+                    loginRequestDTO.password().trim()
             );
 
             Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
