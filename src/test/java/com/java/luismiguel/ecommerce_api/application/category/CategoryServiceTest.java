@@ -49,6 +49,7 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Return Page Of Activated Categories")
         void shouldReturnPageOfActivatedCategories() {
+            // given
             String name = "category";
             String slug = "category-slug";
             LocalDateTime createdAt = LocalDateTime.now();
@@ -66,8 +67,10 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findAllByActiveTrue(any(Pageable.class))).willReturn(categories);
 
+            // when
             Page<GetAllActiveCategoriesDTO> result = categoryService.getAllCategories(pageable);
 
+            // then
             assertThat(result.getTotalElements()).isEqualTo(1);
             assertThat(result.getContent()).hasSize(1);
 
@@ -94,32 +97,41 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Category Not Found")
         void shouldThrowExceptionWhenCategoryNotFound() {
+            // given
             given(categoryRepository.findById(categoryId)).willReturn(Optional.empty());
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.getCategoryById(categoryId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Inactive Category")
         void shouldThrowExceptionWhenInactiveCategory() {
+            // given
             Category category = Category.builder()
                     .active(false)
                     .build();
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.getCategoryById(categoryId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Return Category By Id")
         void shouldReturnCategoryById() {
+            // given
             String name = "category";
             String description = "description";
             String slug = "slug";
@@ -136,8 +148,10 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
+            // when
             GetCategoryResponseDTO result = categoryService.getCategoryById(categoryId);
 
+            // then
             assertThat(result.categoryId()).isEqualTo(categoryId);
             assertThat(result.name()).isEqualTo(name);
             assertThat(result.description()).isEqualTo(description);
@@ -161,40 +175,51 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Category Not Found")
         void shouldThrowExceptionWhenCategoryNotFound() {
+            // given
             given(categoryRepository.findById(categoryId)).willReturn(Optional.empty());
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.softDeleteCategory(categoryId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Inactive Category")
         void shouldThrowExceptionWhenInactiveCategory() {
+            // given
             Category category = Category.builder()
                     .active(false)
                     .build();
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.softDeleteCategory(categoryId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Soft Delete Category Successfully")
         void shouldSoftDeleteCategorySuccessfully() {
+            // given
             Category category = Category.builder()
                     .active(true)
                     .build();
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
+            // when
             categoryService.softDeleteCategory(categoryId);
 
+            // then
             assertThat(category.getActive()).isFalse();
             then(categoryRepository).should().save(category);
         }
@@ -216,34 +241,44 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Category Not Found")
         void shouldThrowExceptionWhenCategoryNotFound() {
+            // given
             given(categoryRepository.findById(categoryId)).willReturn(Optional.empty());
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.updateCategory(categoryId, requestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Inactive Category")
         void shouldThrowExceptionWhenInactiveCategory() {
+            // given
             Category category = Category.builder()
                     .active(false)
                     .build();
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 categoryService.updateCategory(categoryId, requestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Update Category Successfully")
         void shouldUpdateCategorySuccessfully() {
+            // given
             UpdateCategoryRequestDTO updateRequestDTO = new UpdateCategoryRequestDTO(
-                "newCategoryName", "NewCategoryDescription"
+                "   NEWCATEGORYNAME   ",
+                "   newCategoryDescription   "
             );
 
             Category category = Category.builder()
@@ -254,10 +289,12 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
+            // when
             categoryService.updateCategory(categoryId, updateRequestDTO);
 
-            assertThat(updateRequestDTO.name().toLowerCase()).isEqualTo(category.getName());
-            assertThat(updateRequestDTO.description()).isEqualTo(category.getDescription());
+            // then
+            assertThat(category.getName()).isEqualTo("newcategoryname");
+            assertThat(category.getDescription()).isEqualTo("newCategoryDescription");
 
             then(categoryRepository).should().save(category);
         }
@@ -266,8 +303,9 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Update Category Name Successfully")
         void shouldUpdateCategoryNameSuccessfully() {
+            // given
             UpdateCategoryRequestDTO updateRequestDTO = new UpdateCategoryRequestDTO(
-                    "newCategoryName",
+                    "   NEWCATEGORYNAME   ",
                     null
             );
 
@@ -278,10 +316,11 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
+            // when
             categoryService.updateCategory(categoryId, updateRequestDTO);
 
-            assertThat(updateRequestDTO.name().toLowerCase()).isEqualTo(category.getName());
-
+            // then
+            assertThat(category.getName()).isEqualTo("newcategoryname");
             then(categoryRepository).should().save(category);
         }
 
@@ -289,9 +328,10 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("should Update Category Description Successfully")
         void shouldUpdateCategoryDescriptionSuccessfully() {
+            // given
             UpdateCategoryRequestDTO updateRequestDTO = new UpdateCategoryRequestDTO(
                     null,
-                    "newCategoryDescription"
+                    "   newCategoryDescription   "
             );
 
             Category category = Category.builder()
@@ -301,10 +341,11 @@ public class CategoryServiceTest {
 
             given(categoryRepository.findById(categoryId)).willReturn(Optional.of(category));
 
+            // when
             categoryService.updateCategory(categoryId, updateRequestDTO);
 
-            assertThat(updateRequestDTO.description()).isEqualTo(category.getDescription());
-
+            // then
+            assertThat(category.getDescription()).isEqualTo("newCategoryDescription");
             then(categoryRepository).should().save(category);
         }
     }
@@ -322,7 +363,10 @@ public class CategoryServiceTest {
         @BeforeEach
         void setUp() {
             categoryId = UUID.randomUUID();
-            requestDTO = new CreateCategoryRequestDTO("category-name", "category-description");
+            requestDTO = new CreateCategoryRequestDTO(
+                    "  CATEGORYNAME  ",
+                    "   categoryDescription  "
+            );
             categoryName = "category-name";
             categorySlug = "category-slug";
             createdAt = LocalDateTime.now();
@@ -331,22 +375,27 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Category Already Exists")
         void shouldThrowExceptionWhenCategoryAlreadyExists() {
+            // given
             Category category = Category.builder()
                     .name("category-name")
                     .active(true)
                     .build();
 
-            given(categoryRepository.findByName(requestDTO.name())).willReturn(Optional.of(category));
+            given(categoryRepository.findByName(requestDTO.name().trim().toLowerCase())).willReturn(Optional.of(category));
 
-            assertThrows(CategoryAlreadyExistsException.class, () -> {
+            // when + then
+            CategoryAlreadyExistsException exception = assertThrows(CategoryAlreadyExistsException.class, () -> {
                 categoryService.createCategory(requestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Already Exists!");
         }
 
 
         @Test
         @DisplayName("Should Reactivate Existent Inactive Category")
         void shouldReactivateExistentInactiveCategory() {
+            // given
             Category category = Category.builder()
                     .categoryId(categoryId)
                     .name(categoryName)
@@ -359,19 +408,21 @@ public class CategoryServiceTest {
             Category savedCategory = Category.builder()
                     .categoryId(categoryId)
                     .name(categoryName)
-                    .description(requestDTO.description())
+                    .description(requestDTO.description().trim())
                     .slug(categorySlug)
                     .createdAt(createdAt)
                     .active(true)
                     .build();
 
-            given(categoryRepository.findByName(requestDTO.name())).willReturn(Optional.of(category));
+            given(categoryRepository.findByName(requestDTO.name().trim().toLowerCase())).willReturn(Optional.of(category));
             given(categoryRepository.save(category)).willReturn(savedCategory);
 
+            // when
             CreatedCategoryResponseDTO result = categoryService.createCategory(requestDTO);
 
+            // then
             assertThat(result.name()).isEqualTo(categoryName);
-            assertThat(result.description()).isEqualTo(requestDTO.description());
+            assertThat(result.description()).isEqualTo("categoryDescription");
             assertThat(result.slug()).isEqualTo(categorySlug);
             assertThat(result.active()).isTrue();
             assertThat(result.createdAt()).isEqualTo(createdAt);
@@ -381,23 +432,26 @@ public class CategoryServiceTest {
         @Test
         @DisplayName("Should Create New Category Successfully")
         void shouldCreateNewCategorySuccessfully() {
+            // given
             Category savedCategory = Category.builder()
                     .categoryId(categoryId)
-                    .name(requestDTO.name())
-                    .description(requestDTO.description())
+                    .name(requestDTO.name().trim().toLowerCase())
+                    .description(requestDTO.description().trim())
                     .slug(categorySlug)
                     .active(true)
                     .createdAt(createdAt)
                     .build();
 
-            given(categoryRepository.findByName(requestDTO.name())).willReturn(Optional.empty());
+            given(categoryRepository.findByName(requestDTO.name().trim().toLowerCase())).willReturn(Optional.empty());
             given(categoryRepository.save(any(Category.class))).willReturn(savedCategory);
 
+            // when
             CreatedCategoryResponseDTO result = categoryService.createCategory(requestDTO);
 
+            // then
             assertThat(result.categoryId()).isEqualTo(categoryId);
-            assertThat(result.name()).isEqualTo(requestDTO.name());
-            assertThat(result.description()).isEqualTo(requestDTO.description());
+            assertThat(result.name()).isEqualTo("categoryname");
+            assertThat(result.description()).isEqualTo("categoryDescription");
             assertThat(result.slug()).isEqualTo(categorySlug);
             assertThat(result.active()).isTrue();
             assertThat(result.createdAt()).isEqualTo(createdAt);

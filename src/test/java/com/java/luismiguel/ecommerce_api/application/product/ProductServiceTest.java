@@ -16,6 +16,7 @@ import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.produ
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.product.ProductNotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,17 +64,22 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Product Not Found")
         void shouldThrowExceptionWhenProductNotFound() {
+            // given
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.getProductById(productId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Return Product By Id Successfully")
         void shouldReturnProductByIdSuccessfully() {
+            // given
             String productName = "productName";
             String productDescription = "productDescription";
             BigDecimal price = BigDecimal.TEN;
@@ -97,8 +104,10 @@ public class ProductServiceTest {
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
+            // when
             GetProductResponseDTO result = productService.getProductById(productId);
 
+            // then
             assertThat(result.productId()).isEqualTo(productId);
             assertThat(result.name()).isEqualTo(productName);
             assertThat(result.description()).isEqualTo(productDescription);
@@ -124,40 +133,52 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Product Not Found")
         void shouldThrowExceptionWhenProductNotFound() {
+            // given
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.activateProduct(productId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Product Is Already Activated")
         void shouldThrowExceptionWhenProductIsAlreadyActivated() {
+            // given
             Product product = Product.builder()
                     .active(true)
                     .build();
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            assertThrows(ProductAlreadyActivatedException.class, () -> {
+            // when + then
+            ProductAlreadyActivatedException exception = assertThrows(ProductAlreadyActivatedException.class, () -> {
                 productService.activateProduct(productId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Already Activated!");
         }
 
 
         @Test
         @DisplayName("Should Activate Product Successfully")
         void shouldActivateProductSuccessfully() {
+            // given
             Product product = Product.builder()
                     .active(false)
                     .build();
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
+            // when
             productService.activateProduct(productId);
 
+            // then
+            assertThat(product.getActive()).isTrue();
             then(productRepository).should().save(product);
         }
     }
@@ -176,40 +197,52 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Product Not Found")
         void shouldThrowExceptionWhenProductNotFound() {
+            // given
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.deactivateProduct(productId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Product Is Already Deactivated")
         void shouldThrowExceptionWhenProductIsAlreadyDeactivated() {
+            // given
             Product product = Product.builder()
                     .active(false)
                     .build();
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            assertThrows(ProductAlreadyDeactivatedException.class, () -> {
+            // when + then
+            ProductAlreadyDeactivatedException exception = assertThrows(ProductAlreadyDeactivatedException.class, () -> {
                 productService.deactivateProduct(productId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Already Deactivated!");
         }
 
 
         @Test
         @DisplayName("Should Deactivate Product Successfully")
         void shouldDeactivateProductSuccessfully() {
+            // given
             Product product = Product.builder()
                     .active(true)
                     .build();
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
+            // when
             productService.deactivateProduct(productId);
 
+            // then
+            assertThat(product.getActive()).isFalse();
             then(productRepository).should().save(product);
         }
     }
@@ -231,32 +264,41 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Product Not Found")
         void shouldThrowExceptionWhenProductNotFound() {
+            // given
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.adjustStock(productId, requestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Product Inactive")
         void shouldThrowExceptionWhenProductInactive() {
+            // given
             Product product = Product.builder()
                     .active(false)
                     .build();
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.adjustStock(productId, requestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Update Stock Quantity Successfully")
         void shouldUpdateStockQuantitySuccessfully() {
+            // given
             Product product = Product.builder()
                     .active(true)
                     .stockQuantity(2)
@@ -264,8 +306,11 @@ public class ProductServiceTest {
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
+            // when
             productService.adjustStock(productId, requestDTO);
 
+            // then
+            assertThat(product.getStockQuantity()).isEqualTo(10);
             then(productRepository).should().save(product);
         }
     }
@@ -286,8 +331,8 @@ public class ProductServiceTest {
         void setUp() {
             productId = UUID.randomUUID();
             categoryId = UUID.randomUUID();
-            name = "productName";
-            description = "productDescription";
+            name = "  productName  ";
+            description = "  productDescription  ";
             price  = BigDecimal.TEN;
             quantity = 10;
 
@@ -304,17 +349,22 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Category Not Found")
         void shouldThrowExceptionWhenCategoryNotFound() {
+            // given
             given(categoryRepository.findById(requestDTO.categoryId())).willReturn(Optional.empty());
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 productService.createProduct(requestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Create Product Successfully")
         void shouldCreateProductSuccessfully() {
+            // given
             LocalDateTime createdAt = LocalDateTime.now();
 
             Category category = Category.builder()
@@ -323,8 +373,8 @@ public class ProductServiceTest {
 
             Product savedProduct = Product.builder()
                     .productId(productId)
-                    .name(requestDTO.name())
-                    .description(requestDTO.description())
+                    .name(requestDTO.name().trim())
+                    .description(requestDTO.description().trim())
                     .price(requestDTO.price())
                     .createdAt(createdAt)
                     .build();
@@ -332,13 +382,19 @@ public class ProductServiceTest {
             given(categoryRepository.findById(requestDTO.categoryId())).willReturn(Optional.of(category));
             given(productRepository.save(any(Product.class))).willReturn(savedProduct);
 
+            // when
             CreatedProductResponseDTO result = productService.createProduct(requestDTO);
 
+            // then
             assertThat(result.productId()).isEqualTo(productId);
-            assertThat(result.name()).isEqualTo(requestDTO.name());
-            assertThat(result.description()).isEqualTo(requestDTO.description());
+            assertThat(result.name()).isEqualTo("productName");
+            assertThat(result.description()).isEqualTo("productDescription");
             assertThat(result.price()).isEqualByComparingTo(requestDTO.price());
             assertThat(result.createdAt()).isEqualTo(createdAt);
+
+            ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+            then(productRepository).should().save(captor.capture());
+            assertThat(captor.getValue().getCategory()).isEqualTo(category);
         }
     }
 
@@ -357,8 +413,8 @@ public class ProductServiceTest {
         void setUp() {
             productId = UUID.randomUUID();
             categoryId = UUID.randomUUID();
-            name = "newName";
-            description = "newDescription";
+            name = "  newName  ";
+            description = "  newDescription  ";
             price  = BigDecimal.TEN;
 
             updateRequestDTO = new UpdateProductRequestDTO(
@@ -372,32 +428,41 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Product Not Found")
         void shouldThrowExceptionWhenProductNotFound() {
+            // given
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.updateProduct(productId, updateRequestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Product Inactive")
         void shouldThrowExceptionWhenProductInactive() {
+            // given
             Product product = Product.builder()
                     .active(false)
                     .build();
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 productService.updateProduct(productId, updateRequestDTO);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Category Not Found")
         void shouldThrowExceptionWhenCategoryNotFound() {
+            // given
             UpdateProductRequestDTO request = new UpdateProductRequestDTO(
                     null,
                     null,
@@ -412,15 +477,19 @@ public class ProductServiceTest {
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
             given(categoryRepository.findById(request.categoryId())).willReturn(Optional.empty());
 
-            assertThrows(CategoryNotFoundException.class, () -> {
+            // when + then
+            CategoryNotFoundException exception = assertThrows(CategoryNotFoundException.class, () -> {
                 productService.updateProduct(productId, request);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Category Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Update All Fields Successfully")
         void shouldUpdateAllFieldsSuccessfully() {
+            // given
             Category oldCategory = Category.builder()
                     .name("oldCategory")
                     .build();
@@ -440,10 +509,12 @@ public class ProductServiceTest {
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
             given(categoryRepository.findById(updateRequestDTO.categoryId())).willReturn(Optional.of(newCategory));
 
+            // when
             productService.updateProduct(productId, updateRequestDTO);
 
-            assertThat(product.getName()).isEqualTo(updateRequestDTO.name());
-            assertThat(product.getDescription()).isEqualTo(updateRequestDTO.description());
+            // then
+            assertThat(product.getName()).isEqualTo("newName");
+            assertThat(product.getDescription()).isEqualTo("newDescription");
             assertThat(product.getPrice()).isEqualByComparingTo(updateRequestDTO.price());
             assertThat(product.getCategory().getName()).isEqualTo(newCategory.getName());
 
@@ -454,8 +525,9 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Update Only Name When Another Fields Are Null")
         void shouldUpdateOnlyNameWhenAnotherFieldsAreNull() {
+            // given
             UpdateProductRequestDTO request = new UpdateProductRequestDTO(
-                    "newName",
+                    "  newName  ",
                     null,
                     null,
                     null
@@ -475,9 +547,11 @@ public class ProductServiceTest {
 
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
+            // when
             productService.updateProduct(productId, request);
 
-            assertThat(product.getName()).isEqualTo(request.name());
+            // then
+            assertThat(product.getName()).isEqualTo("newName");
             assertThat(product.getDescription()).isEqualTo("oldDescription");
             assertThat(product.getPrice()).isEqualByComparingTo(BigDecimal.ONE);
             assertThat(product.getCategory().getName()).isEqualTo("oldCategory");
@@ -500,6 +574,7 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Return All Products Without Filters Successfully")
         void shouldReturnAllProductsWithoutFiltersSuccessfully() {
+            // given
             Category category = Category.builder()
                     .categoryId(categoryId)
                     .name("category")
@@ -518,6 +593,7 @@ public class ProductServiceTest {
 
             given(productRepository.findAll(any(Specification.class), eq(pageable))).willReturn(productsPage);
 
+            // when
             Page<GetAllProductsResponseDTO> result = productService.getAllProducts(
                     null,
                     null,
@@ -526,6 +602,7 @@ public class ProductServiceTest {
                     pageable
             );
 
+            // then
             assertThat(result.getTotalElements()).isEqualTo(1);
             assertThat(result.getContent()).hasSize(1);
 
@@ -541,6 +618,7 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Filter Products By Name")
         void shouldFilterProductsByName() {
+            // given
             Category category = Category.builder()
                     .categoryId(categoryId)
                     .name("category")
@@ -560,6 +638,7 @@ public class ProductServiceTest {
             given(productRepository.findAll(any(Specification.class), eq(pageable)))
                     .willReturn(productsPage);
 
+            // when
             Page<GetAllProductsResponseDTO> result = productService.getAllProducts(
                     "product",
                     null,
@@ -568,6 +647,7 @@ public class ProductServiceTest {
                     pageable
             );
 
+            // then
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().getFirst().name()).isEqualTo("100 Product");
         }
@@ -576,6 +656,7 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Filter Products By Category")
         void shouldFilterProductsByCategory() {
+            // given
             Category category = Category.builder()
                     .categoryId(categoryId)
                     .name("category")
@@ -595,6 +676,7 @@ public class ProductServiceTest {
             given(productRepository.findAll(any(Specification.class), eq(pageable)))
                     .willReturn(productsPage);
 
+            // when
             Page<GetAllProductsResponseDTO> result = productService.getAllProducts(
                     null,
                     categoryId,
@@ -603,6 +685,7 @@ public class ProductServiceTest {
                     pageable
             );
 
+            // then
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().getFirst().categoryName()).isEqualTo("category");
         }
@@ -611,6 +694,7 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Filter Products By Price Range")
         void shouldFilterProductsByPriceRange() {
+            // given
             Category category = Category.builder()
                     .categoryId(categoryId)
                     .name("category")
@@ -630,6 +714,7 @@ public class ProductServiceTest {
             given(productRepository.findAll(any(Specification.class), eq(pageable)))
                     .willReturn(productsPage);
 
+            // when
             Page<GetAllProductsResponseDTO> result = productService.getAllProducts(
                     null,
                     null,
@@ -638,6 +723,7 @@ public class ProductServiceTest {
                     pageable
             );
 
+            // then
             assertThat(result.getContent()).hasSize(1);
             GetAllProductsResponseDTO dto = result.getContent().getFirst();
 
@@ -649,6 +735,7 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should Combine Multiple Filters")
         void shouldCombineMultipleFilters() {
+            // given
             Category category = Category.builder()
                     .categoryId(categoryId)
                     .name("category")
@@ -668,6 +755,7 @@ public class ProductServiceTest {
             given(productRepository.findAll(any(Specification.class), eq(pageable)))
                     .willReturn(productsPage);
 
+            // when
             Page<GetAllProductsResponseDTO> result = productService.getAllProducts(
                     "product",
                     categoryId,
@@ -676,6 +764,7 @@ public class ProductServiceTest {
                     pageable
             );
 
+            // then
             GetAllProductsResponseDTO dto = result.getContent().getFirst();
 
             assertThat(dto.name()).containsIgnoringCase("product");
