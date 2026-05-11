@@ -1,4 +1,7 @@
 spring:
+  server:
+    port: ${PORT:8080}
+
   datasource:
     url: ${POSTGRES_DB_URL}
     username: ${POSTGRES_DB_USER}
