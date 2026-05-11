@@ -14,6 +14,7 @@ import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.auth.
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtProperties;
 import com.java.luismiguel.ecommerce_api.infrastructure.security.jwt.JwtService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -42,6 +44,10 @@ public class AuthService {
 
     @Transactional
     public UserResponseDTO registerNewUser(RegisterRequestDTO registerRequestDTO) {
+        if (userRepository.existsByEmail(registerRequestDTO.email().toLowerCase().trim())){
+            throw new UserEmailAlreadyRegisteredException();
+        }
+
         User user = User.builder()
                 .email(registerRequestDTO.email().toLowerCase().trim())
                 .username(registerRequestDTO.username().trim())
@@ -66,9 +72,9 @@ public class AuthService {
             );
 
         } catch (DataIntegrityViolationException exception) {
-            throw new UserEmailAlreadyRegisteredException();
+            log.warn("User Registration Data Integrity Violation! User Email -> {}", registerRequestDTO.email());
+            throw new UserRegistrationDataIntegrityException();
         }
-
     }
 
 
