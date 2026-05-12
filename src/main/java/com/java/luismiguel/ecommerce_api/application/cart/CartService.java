@@ -79,10 +79,15 @@ public class CartService {
 
         if (existing.isPresent()) {
             CartItem cartItem = existing.get();
-            cartItem.setQuantity(cartItem.getQuantity() + addCartItemRequestDTO.quantity());
+
+            int newQuantity = cartItem.getQuantity() + addCartItemRequestDTO.quantity();
+            productIsInStock(product, newQuantity);
+
+            cartItem.setQuantity(newQuantity);
             cartItem.setSubtotal(sumSubTotal(cartItem.getUnitPrice(), cartItem.getQuantity()));
 
         } else {
+            productIsInStock(product, addCartItemRequestDTO.quantity());
             cart.getItems().addLast(newCartItem);
         }
 
