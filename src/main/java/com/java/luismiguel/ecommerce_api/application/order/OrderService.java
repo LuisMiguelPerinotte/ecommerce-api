@@ -169,7 +169,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(OrderNotFoundException::new);
 
-        if (order.getUser().getUserId().equals(user.getUserId())) {
+        if (!order.getUser().getUserId().equals(user.getUserId())) {
             throw new OrderNotFoundException();
         }
         if (order.getOrderStatus() != OrderStatus.PENDING && order.getOrderStatus() != OrderStatus.AWAITING_PAYMENT) {
