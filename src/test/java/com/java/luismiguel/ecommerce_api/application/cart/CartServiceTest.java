@@ -26,8 +26,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class CartServiceTest {
@@ -62,6 +64,7 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Return Cart With Items")
         void shouldReturnCartWithItems() {
+            // given
             Product product = Product.builder()
                     .productId(productId)
                     .name("Test Product")
@@ -95,8 +98,10 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(cartRepository.getCartSummary(cartId)).willReturn(summary);
 
+            // when
             GetCartResponseDTO result = cartService.getCart(userId);
 
+            // then
             assertThat(result.cartId()).isEqualTo(cartId);
             assertThat(result.items()).hasSize(1);
             assertThat(result.totalItems()).isEqualTo(2);
@@ -112,6 +117,7 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Return Empty Cart")
         void shouldReturnEmptyCart() {
+            // given
             Cart cart = Cart.builder()
                     .cartId(cartId)
                     .items(new ArrayList<>())
@@ -132,8 +138,10 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(cartRepository.getCartSummary(cartId)).willReturn(summary);
 
+            // when
             GetCartResponseDTO result = cartService.getCart(userId);
 
+            // then
             assertThat(result.cartId()).isEqualTo(cartId);
             assertThat(result.items()).isEmpty();
             assertThat(result.totalItems()).isZero();
@@ -163,18 +171,23 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Product Not Found")
         void shouldThrowExceptionWhenProductNotFound() {
+            // given
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.empty());
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 cartService.addCartItem(addCartItemRequestDTO, userId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Product Is Not Active")
         void shouldThrowExceptionWhenProductIsNotActive() {
+            // given
             Product product = Product.builder()
                     .productId(productId)
                     .active(false)
@@ -183,16 +196,23 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            assertThrows(ProductNotFoundException.class, () -> {
+            // when + then
+            ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
                 cartService.addCartItem(addCartItemRequestDTO, userId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Product Has Insufficient Stock")
         void shouldThrowExceptionWhenProductHasInsufficientStock() {
+            // given
+            String productName = "productName";
+
             Product product = Product.builder()
+                    .name(productName)
                     .active(Boolean.TRUE)
                     .stockQuantity(0)
                     .build();
@@ -200,15 +220,58 @@ public class CartServiceTest {
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-            assertThrows(InsufficientProductStockException.class, () -> {
+            // when + then
+            InsufficientProductStockException exception = assertThrows(InsufficientProductStockException.class, () -> {
                 cartService.addCartItem(addCartItemRequestDTO, userId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product " + productName + " has Insufficient Stock!");
+        }
+
+
+        @Test
+        @DisplayName("Should Throw Exception When Existing Cart Item Quantity Exceeds Product Stock")
+        void shouldThrowExceptionWhenExistingCartItemQuantityExceedsProductStock() {
+            // given
+            addCartItemRequestDTO = new AddCartItemRequestDTO(productId, 3);
+
+            String productName = "productName";
+
+            Product product = Product.builder()
+                    .productId(productId)
+                    .name(productName)
+                    .price(BigDecimal.TEN)
+                    .active(Boolean.TRUE)
+                    .stockQuantity(5)
+                    .build();
+
+            CartItem cartItem = CartItem.builder()
+                    .product(product)
+                    .quantity(4)
+                    .unitPrice(BigDecimal.TEN)
+                    .subtotal(BigDecimal.valueOf(40))
+                    .build();
+
+            cart.setItems(new ArrayList<>(List.of(cartItem)));
+
+            given(cartRepository.findByUserUserId(userId)).willReturn(cart);
+            given(productRepository.findById(productId)).willReturn(Optional.of(product));
+
+            // when + then
+            InsufficientProductStockException exception = assertThrows(InsufficientProductStockException.class, () -> {
+                cartService.addCartItem(addCartItemRequestDTO, userId);
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Product " + productName + " has Insufficient Stock!");
+
+            then(cartRepository).should(never()).save(any(Cart.class));
         }
 
 
         @Test
         @DisplayName("Should Add Quantity When Product Already Exists In Cart")
         void shouldAddQuantityWhenProductAlreadyExistsInCart() {
+            // given
             Product product = Product.builder()
                     .productId(productId)
                     .active(true)
@@ -224,7 +287,7 @@ public class CartServiceTest {
                     .subtotal(BigDecimal.valueOf(50))
                     .build();
 
-            cart.setItems(List.of(cartItem));
+            cart.setItems(new ArrayList<>(List.of(cartItem)));
 
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
             given(productRepository.findById(productId)).willReturn(Optional.of(product));
@@ -235,8 +298,10 @@ public class CartServiceTest {
 
             given(cartRepository.save(cart)).willReturn(savedCart);
 
+            // when
             AddedCartItemDTO result = cartService.addCartItem(addCartItemRequestDTO, userId);
 
+            // then
             assertThat(result.quantity()).isEqualTo(2);
         }
 
@@ -244,6 +309,7 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Add New Item When Product Not In Cart")
         void shouldAddNewItemWhenProductNotInCart() {
+            // given
             Product product = Product.builder()
                     .productId(productId)
                     .active(Boolean.TRUE)
@@ -262,8 +328,10 @@ public class CartServiceTest {
 
             given(cartRepository.save(cart)).willReturn(savedCart);
 
+            // when
             AddedCartItemDTO result = cartService.addCartItem(addCartItemRequestDTO, userId);
 
+            // then
             assertThat(result.quantity()).isEqualTo(1);
         }
     }
@@ -282,20 +350,25 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Cart Item Not Found")
         void shouldThrowExceptionWhenCartItemNotFound() {
+            // given
             UpdateCartItemQuantityRequestDTO requestDTO =
                     new UpdateCartItemQuantityRequestDTO(1);
 
             given(cartItemRepository.findById(cartItemId)).willReturn(Optional.empty());
 
-            assertThrows(CartItemNotFoundException.class, () -> {
+            // when + then
+            CartItemNotFoundException exception = assertThrows(CartItemNotFoundException.class, () -> {
                 cartService.updateCartItemQuantity(requestDTO, cartItemId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Cart Item Not Found!");
         }
 
 
         @Test
         @DisplayName("Should Remove Cart Item If Quantity Equals Zero")
         void shouldRemoveCartItemIfQuantityEqualsZero() {
+            // given
             UpdateCartItemQuantityRequestDTO requestDTO =
                     new UpdateCartItemQuantityRequestDTO(0);
 
@@ -306,17 +379,23 @@ public class CartServiceTest {
             given(cartItemRepository.findById(cartItemId)).willReturn(Optional.of(cartItem));
             given(cartItemRepository.existsById(cartItemId)).willReturn(true);
 
+            // when
             cartService.updateCartItemQuantity(requestDTO, cartItemId);
 
+            // then
             then(cartItemRepository).should().deleteById(cartItemId);
+            then(cartRepository).should(never()).save(any());
         }
 
 
         @Test
         @DisplayName("Should Throw Exception When Insufficient Stock")
         void shouldThrowExceptionWhenInsufficientStock() {
+            // given
+            String productName = "Test Product";
+
             Product product = Product.builder()
-                    .name("Test Product")
+                    .name(productName)
                     .stockQuantity(5)
                     .build();
 
@@ -331,15 +410,19 @@ public class CartServiceTest {
 
             given(cartItemRepository.findById(cartItemId)).willReturn(Optional.of(cartItem));
 
-            assertThrows(InsufficientProductStockException.class, () -> {
+            // when + then
+            InsufficientProductStockException exception = assertThrows(InsufficientProductStockException.class, () -> {
                 cartService.updateCartItemQuantity(requestDTO, cartItemId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Product " + productName + " has Insufficient Stock!");
         }
 
 
         @Test
         @DisplayName("Should Update Quantity Successfully")
         void shouldUpdateQuantitySuccessfully() {
+            // given
             Product product = Product.builder()
                     .stockQuantity(100)
                     .build();
@@ -357,8 +440,10 @@ public class CartServiceTest {
 
             given(cartItemRepository.findById(cartItemId)).willReturn(Optional.of(cartItem));
 
+            // when
             cartService.updateCartItemQuantity(requestDTO, cartItemId);
 
+            // then
             assertThat(cartItem.getQuantity()).isEqualTo(10);
             assertThat(cartItem.getSubtotal()).isEqualByComparingTo(BigDecimal.valueOf(100));
             then(cartItemRepository).should().save(cartItem);
@@ -379,19 +464,27 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Cart Item Not Found")
         void shouldThrowExceptionWhenCartItemNotFound() {
+            // given
             given(cartItemRepository.existsById(itemId)).willReturn(false);
 
-            assertThrows(CartItemNotFoundException.class, () -> {
+            // when + then
+            CartItemNotFoundException exception = assertThrows(CartItemNotFoundException.class, () -> {
                 cartService.removeCartItem(itemId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("Cart Item Not Found!");
         }
 
         @Test
         @DisplayName("Should Delete Cart Item When Exists")
         void shouldDeleteCartItemWhenExists() {
+            // given
             given(cartItemRepository.existsById(itemId)).willReturn(true);
 
+            // when
             cartService.removeCartItem(itemId);
+
+            // then
             then(cartItemRepository).should().deleteById(itemId);
         }
     }
@@ -413,32 +506,41 @@ public class CartServiceTest {
         @Test
         @DisplayName("Should Throw Exception When Cart Is Empty")
         void shouldThrowExceptionWhenCartIsEmpty() {
+            // given
             Cart cart = Cart.builder()
                     .items(new ArrayList<>())
                     .build();
 
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
 
-            assertThrows(CartIsEmptyException.class, () -> {
+            // when + then
+            CartIsEmptyException exception = assertThrows(CartIsEmptyException.class, () -> {
                 cartService.cleanCart(userId);
             });
+
+            assertThat(exception.getMessage()).isEqualTo("The Cart Is Already Empty!");
         }
 
 
         @Test
         @DisplayName("Should Clean Cart When Contains Items")
         void shouldCleanCartWhenContainsItems() {
+            // given
             CartItem cartItem = CartItem.builder()
                     .quantity(1)
                     .build();
 
             Cart cart = Cart.builder()
                     .cartId(cartId)
-                    .items(List.of(cartItem))
+                    .items(new ArrayList<>(List.of(cartItem)))
                     .build();
 
             given(cartRepository.findByUserUserId(userId)).willReturn(cart);
+
+            // when
             cartService.cleanCart(userId);
+
+            // then
             then(cartItemRepository).should().deleteAllByCartId(cartId);
         }
     }
