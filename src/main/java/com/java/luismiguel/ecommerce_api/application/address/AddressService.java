@@ -9,6 +9,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.address.response.GetAllUserAddr
 import com.java.luismiguel.ecommerce_api.domain.address.Address;
 import com.java.luismiguel.ecommerce_api.domain.address.AddressRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
+import com.java.luismiguel.ecommerce_api.infrastructure.client.viacep.ViaCepClient;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.address.AddressAlreadyExistsException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.address.AddressIsAlreadyDefaultException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.address.AddressNotFoundException;
@@ -16,7 +17,6 @@ import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.addre
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.text.Normalizer;
 import java.util.Locale;
@@ -26,9 +26,11 @@ import java.util.UUID;
 @Service
 public class AddressService {
     private final AddressRepository addressRepository;
+    private final ViaCepClient viaCepClient;
 
-    public AddressService(AddressRepository addressRepository) {
+    public AddressService(AddressRepository addressRepository, ViaCepClient viaCepClient) {
         this.addressRepository = addressRepository;
+        this.viaCepClient = viaCepClient;
     }
 
 
@@ -204,15 +206,6 @@ public class AddressService {
 
 
     // Private Methods
-    private AddressDataFromRequestDTO requestToApiViaCep(String zipCode) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        return restTemplate.getForObject(
-                String.format("https://viacep.com.br/ws/%s/json", zipCode),
-                AddressDataFromRequestDTO.class);
-    }
-
-
     private static CreatedAddressResponseDTO toCreatedAddressDTO(Address savedAddress) {
         return new CreatedAddressResponseDTO(
                 savedAddress.getAddressId(),
@@ -258,7 +251,7 @@ public class AddressService {
 
 
     private AddressDataFromRequestDTO validateZipCodeAndGetAddressData(String zipCode) {
-        AddressDataFromRequestDTO addressData = requestToApiViaCep(zipCode);
+        AddressDataFromRequestDTO addressData = viaCepClient.getAddressData(zipCode);
 
         if (addressData.erro() != null) {
             throw new InvalidZipCodeException();
