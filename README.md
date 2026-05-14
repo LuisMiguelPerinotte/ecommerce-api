@@ -35,7 +35,7 @@ This project aims to:
 | Payment integration            | Implemented | Stripe gateway integration                  |
 | Address management             | Implemented | Manage shipping addresses                   |
 | Admin panel                    | Implemented | Admin endpoints for managing catalog/users  |
-| API documentation (Swagger)    | In Progress | Interactive API docs with Springdoc/OpenAPI |
+| API documentation (Swagger)    | Implemented | Interactive API docs with Springdoc/OpenAPI |
 | Automated tests                | In Progress | Unit and integration tests                  |
 
 ---
