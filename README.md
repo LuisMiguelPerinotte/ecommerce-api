@@ -1,262 +1,296 @@
 # 🛒 E-Commerce API
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions)
-[![Java](https://img.shields.io/badge/Java-21-blue)](https://adoptopenjdk.net/)
+![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192?logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Cache-DD0031?logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-Payments-635BFF?logo=stripe&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-Authentication-black?logo=jsonwebtokens&logoColor=white)
+![Flyway](https://img.shields.io/badge/Flyway-Migrations-CC0200?logo=flyway&logoColor=white)
 
 ---
 
 ## ✨ Overview
-E-Commerce API is a backend RESTful service for online stores built with Java and Spring Boot.
-It exposes endpoints for user management, product catalog, shopping cart, order processing and payment integration.
-The codebase is structured to be modular and easy to extend — suitable as a learning project or a starting point for production systems.
+E-Commerce API is a RESTful backend application built with Java 21 and Spring Boot.
+
+It provides features for user authentication, product catalog management, shopping cart operations, order processing, address management and payment integration with Stripe.
+
+The project was developed as a backend portfolio project, focusing on layered architecture, business rule validation, database migrations, external service integration, caching and automated tests.
 
 > **Project Status:** In development 🚧 — contributions, issues and pull requests are welcome.
 
 ---
 
 ## 💡 Motivation
-This project aims to:
-- Demonstrate best practices in Java/Spring Boot API development
-- Serve as a portfolio piece for backend engineering
-- Provide a modular, extensible base for e-commerce applications
+
+The goal of this project is to simulate the backend of a real e-commerce application while applying common backend engineering practices, such as:
+
+- Layered architecture
+- Authentication and authorization
+- Database versioning
+- Cache usage
+- Payment gateway integration
+- Automated testing
+- API documentation
 
 ---
 
 ## 🚀 Features
-| Feature                        | Status      | Description                                 |
-|------------------------------- |-------------|---------------------------------------------|
-| 👥 User registration/login     | Implemented | JWT-based authentication and authorization  |
-| 📦 Product management          | Implemented | CRUD for products and categories            |
-| 🧺 Shopping cart               | Implemented | Add/remove/update items, view cart          |
-| 🧾 Order processing            | Implemented | Place orders, order history                 |
-| 💳 Payment integration         | Implemented | Stripe gateway integration                  |
-| 🏠 Address management          | Implemented | Manage shipping addresses                   |
-| 🛠️ Admin panel                | Implemented | Admin endpoints for managing catalog/users  |
-| 📚 API documentation (Swagger) | Implemented | Interactive API docs with Springdoc/OpenAPI |
-| ✅ Automated tests             | In Progress | Unit and integration tests                  |
+| Feature                          | Status     | Description                                        |
+|----------------------------------|------------|----------------------------------------------------|
+| 👥 User registration/login       | Implemented | JWT-based authentication and authorization         |
+| 📦 Product management            | Implemented | CRUD for products and categories                   |
+| 🧺 Shopping cart                 | Implemented | Add/remove/update items, view cart                 |
+| 🧾 Order processing              | Implemented | Place orders, order history                        |
+| 💳 Payment integration           | Implemented | Stripe gateway integration                         |
+| 🏠 Address management            | Implemented | Manage shipping addresses                          |
+| 🛠️ Admin endpoints              |Implemented | Protected endpoints for managing catalog/users     |
+| 📚 API documentation (Swagger)   | Implemented | Interactive API docs with Springdoc/OpenAPI        |
+| ✅ Automated tests                | In Progress | Unit and integration tests for core business rules |
 
 ---
 
-## Architecture 🏗️
-- 🌱 **Spring Boot**: Main framework for REST API
-- 🗄️ **Spring Data JPA**: ORM and database access
-- 🧭 **Flyway**: Database migrations
-- 🔐 **JWT**: Secure authentication
-- 🐳 **Docker**: Containerization for easy deployment
-- 🐘 **PostgreSQL**: Default database (can be swapped)
+## 📌 Business Rules
+
+- A user cannot register with an email that is already in use.
+- A shopping cart is automatically created when a new user registers.
+- Products can only be added to the cart if there is enough stock available.
+- An order can only be created from a valid cart with items.
+- Cart items are converted into order items when an order is created.
+- Payment status changes are processed through Stripe webhooks.
+- Approved payments update the related order status.
+- Expired or failed payments do not complete the order.
+- Common users cannot access administrative endpoints.
+- Admin users cannot change their own role.
+
+---
+
+## 🏗️ Architecture
+
+The project follows a layered architecture to separate responsibilities and keep the codebase easier to maintain and test.
+
+- **API layer**: exposes REST endpoints and handles request/response DTOs.
+- **Application layer**: contains business services and use case orchestration.
+- **Domain layer**: contains entities, repositories and domain enums.
+- **Infrastructure layer**: contains security, configuration, exception handling and external integrations.
+
+Main flow:
+
+```txt
+Controller → Service → Repository → Database
+```
+
+---
+
+## 🧠 Technical Decisions
+
+- **JWT authentication** was used to keep the API stateless and protect private endpoints.
+- **DTOs** are used to avoid exposing JPA entities directly through the API.
+- **Flyway** is used to version and apply database schema changes safely.
+- **Redis** is used as a cache layer to reduce unnecessary database access.
+- **Stripe webhooks** are used to update payments asynchronously based on external payment events.
+- **Global exception handling** centralizes API error responses and keeps controllers cleaner.
+- **Layered architecture** separates HTTP concerns, business logic, domain models and infrastructure details.
+
+---
+
+## 🧩 Entity Relationship Diagram
+The diagram below represents the main entities and relationships in the e-commerce domain.
+
+```mermaid
+erDiagram
+    USER {
+        UUID user_id PK
+        string username
+        string email
+        string password
+        string user_role
+        boolean active
+        datetime created_at
+        datetime updated_at
+    }
+
+    CART {
+        UUID cart_id PK
+        UUID user_id FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    CART_ITEM {
+        UUID cart_item_id PK
+        UUID cart_id FK
+        UUID product_id FK
+        int quantity
+        decimal unit_price
+        decimal subtotal
+    }
+
+    PRODUCT {
+        UUID product_id PK
+        string name
+        string description
+        decimal price
+        int stock_quantity
+        boolean active
+        UUID category_id FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    CATEGORY {
+        UUID category_id PK
+        string name
+        string description
+        string slug
+        boolean active
+        datetime created_at
+    }
+
+    ADDRESS {
+        UUID address_id PK
+        UUID user_id FK
+        string street
+        string house_number
+        string complement
+        string neighborhood
+        string city
+        string state
+        string zip_code
+        boolean is_default
+        boolean active
+    }
+
+    ORDER {
+        UUID order_id PK
+        UUID user_id FK
+        UUID shipping_address_id FK
+        string order_status
+        decimal total_amount
+        string user_notes
+        datetime created_at
+        datetime updated_at
+    }
+
+    ORDER_ITEM {
+        UUID order_item_id PK
+        UUID order_id FK
+        UUID product_id FK
+        string product_name
+        string product_sku
+        decimal unit_price
+        int quantity
+        decimal subtotal
+    }
+
+    PAYMENT {
+        UUID payment_id PK
+        UUID order_id FK
+        string stripe_session_id
+        string payment_intent_id
+        decimal amount
+        string currency
+        string status
+        string failure_reason
+        datetime paid_at
+        datetime failedAt
+        datetime createdAt
+    }
+
+    USER ||--|| CART : "has"
+    USER ||--o{ ADDRESS : "has"
+    USER ||--o{ "ORDER" : "places"
+
+    CART ||--o{ CART_ITEM : "contains"
+    PRODUCT ||--o{ CART_ITEM : "appears_in"
+
+    CATEGORY ||--o{ PRODUCT : "has"
+    PRODUCT }o--|| CATEGORY : "belongs_to"
+
+    "ORDER" ||--o{ ORDER_ITEM : "contains"
+    PRODUCT ||--o{ ORDER_ITEM : "is"
+
+    ADDRESS ||--o{ "ORDER" : "ships_to"
+    "ORDER" }o--|| ADDRESS : "shipping_address"
+
+    "ORDER" ||--o{ PAYMENT : "has"
+    PAYMENT }o--|| "ORDER" : "for"
+```
+
+---
 
 ### 🗂️ Directory Structure
 ```
-<repo-root>/
-├─ pom.xml                      # Maven build file: dependencies, plugins, build lifecycle
-├─ mvnw, mvnw.cmd               # Maven wrapper: run Maven without installing it globally
-├─ Dockerfile                   # Image build instructions for the application
-├─ docker-compose.yml          # Compose stack (Postgres, Redis) used for local development
-├─ README.md                    # Project documentation (this file)
-├─ LICENSE                      # Project license (MIT)
-├─ .env.example                 # Example env vars used by application.yml via config.import
-├─ .gitignore                   # Files/dirs ignored by Git
-└─ src/
-   ├─ main/
-   │  ├─ java/
-   │  │  └─ com/java/luismiguel/ecommerce_api/
-   │  │     ├─ EcommerceApiApplication.java   # Spring Boot entrypoint (main method)
-   │  │     ├─ api/                           # HTTP layer (controllers, request/response DTOs)
-   │  │     │  ├─ controller/                 # REST controllers, mapping endpoints
-   │  │     │  └─ dto/                        # DTOs for requests and responses
-   │  │     ├─ application/                   # service implementations
-   │  │     ├─ domain/                        # JPA entities, repositories and enums
-   │  │     └─ infrastructure/                # Integrations & technical implementations
-   │  │        ├─ client/                     # External clients
-   │  │        ├─ config/                     # Spring configuration classes
-   │  │        ├─ exception/                  # Exception types and handlers (GlobalExceptionHandler)
-   │  │        └─ security/                   # Security Config and JWT
-   │  └─ resources/
-   │     ├─ application.yml                  # Main configuration (reads env vars)
-   │     ├─ db/
-   │     │  └─ migration/                    # Flyway SQL migrations (V1__, V2__, ...)
-   │     ├─ static/                          # Static assets served by Spring (if any)
-   │     └─ templates/                       # Template views (thymeleaf/free marker) if used
-   └─ test/
-      ├─ java/
-      │  └─ com/java/luismiguel/             # Unit and integration tests mirroring main packages
-      └─ resources/
-         └─ application-test.yml             # Test properties
+ src/main/java/com/java/luismiguel/ecommerce_api
+├── api              # Controllers and DTOs
+├── application      # Business services
+├── domain           # Entities, repositories and enums
+└── infrastructure   # Security, exceptions, configs and integrations
 ```
 
 ---
 
-## Configuration: `.env.example` and `application.yml`
-This project reads basic configuration from environment variables and `application.yml`. A `.env.example` is included at the repository root to show the variables the application expects. Copy it to `.env` (or set variables in your environment) and update the values.
+## ⚙️ Configuration
 
-Key variables in `.env.example` (already present in the repo):
-- `POSTGRES_DB_URL` — JDBC URL used by Spring Boot. When using Supabase, set it like:
+The application uses environment variables for database, cache, JWT and Stripe configuration.
 
-  jdbc:postgresql://<SUPABASE_HOST>:5432/<DB_NAME>?sslmode=require
+Create a `.env` file based on `.env.example`:
 
-  Example:
-  ```text
-  POSTGRES_DB_URL=jdbc:postgresql://db.abcd.supabase.co:5432/postgres?sslmode=require
-  POSTGRES_DB_USER=postgres
-  POSTGRES_DB_PASSWORD=your_supabase_db_password
-  ```
+```bash
+cp .env.example .env
+```
+### Main variables
+```env
+POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/ecommerce_db
+POSTGRES_DB_USER=ecom_user
+POSTGRES_DB_PASSWORD=secret
 
-- `POSTGRES_DB_USER`, `POSTGRES_DB_PASSWORD` — database credentials.
-- `JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION` — used by the JWT implementation (keep `JWT_SECRET` secret in production).
-- `REDIS_HOST`, `REDIS_PORT` — connection for Redis (used for caches/sessions). Default in the `.env.example` points to a `redis` host used by Docker Compose.
-- `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET` — Stripe credential and webhook secret.
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_redis_password
 
-How `application.yml` maps these variables (see `src/main/resources/application.yml`):
-```yaml
-spring:
-  datasource:
-    url: ${POSTGRES_DB_URL}
-    username: ${POSTGRES_DB_USER}
-    password: ${POSTGRES_DB_PASSWORD}
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-  flyway:
-    placeholders:
-      admin_email: ${ADMIN_EMAIL}
-      admin_password: ${ADMIN_PASSWORD}
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRATION=3600000
+JWT_REFRESH_EXPIRATION=604800000
 
-stripe:
-  api:
-    key: ${STRIPE_API_KEY}
+# ADMIN ACCESS
+ADMIN_EMAIL=admin@ecommerce.com
+ADMIN_PASSWORD=$2a$10$xK9Lm...  ← BCrypt hash
 
-  webhook:
-    secret: ${STRIPE_WEBHOOK_SECRET}
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION}
-  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+STRIPE_API_KEY=your_stripe_api_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 ```
 
-Notes:
-- `application.yml` includes `config.import: optional:file:.env[.properties]`, so using a `.env` file in the repository root is a convenient way to load variables during local development. In production prefer environment variables or a secrets manager.
-- `POSTGRES_DB_URL` must be a valid JDBC URL. When using managed hosts (like Supabase) confirm whether `sslmode=require` or certificate options are required.
+For hosted databases, configure the same variables using your provider credentials.
 
 ---
 
+## 🗃️ Database & Cache
 
-## 🧰 Stack
+The application uses **PostgreSQL** as the main database and **Redis** as a cache layer.
 
-### ⚙️ Languages & Runtimes
+PostgreSQL stores the core application data, while Redis is used to cache frequently accessed data and reduce unnecessary database queries.
 
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+Both services can be started locally with Docker Compose:
 
-### 🧩 Frameworks & Libraries
-
-![Spring](https://img.shields.io/badge/Spring%20Boot-6DB33F.svg?style=for-the-badge&logo=Spring-Boot&logoColor=white)
-![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white)
-![Flyway](https://img.shields.io/badge/Flyway-CC0200.svg?style=for-the-badge&logo=Flyway&logoColor=white)
-![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
-![JUnit5](https://img.shields.io/badge/JUnit5-f5f5f5?style=for-the-badge&logo=junit5&logoColor=dc524a)
-
-### 🔒 Security
-
-![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F.svg?style=for-the-badge&logo=Spring-Security&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
-
-### 🗃️ Database & Cache
-
-![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
-![H2](https://img.shields.io/badge/H2%20Database-09476B.svg?style=for-the-badge&logo=H2-Database&logoColor=white)
-
-### 🚀 DevOps & Containerization
-
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-![Maven](https://img.shields.io/badge/Apache%20Maven-C71A36.svg?style=for-the-badge&logo=Apache-Maven&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=GitHub-Actions&logoColor=white)
-
-### 💳 Payments & Integrations
-
-![Stripe](https://img.shields.io/badge/Stripe-5469d4?style=for-the-badge&logo=stripe&logoColor=ffffff)
+```bash
+docker-compose up -d postgres redis
+```
 
 ---
 
-## 🗃️ Database — local or hosted (e.g. Supabase)
-This project supports running Postgres either locally (via Docker Compose) or using a hosted Postgres service such as Supabase, AWS RDS, ElephantSQL, DigitalOcean, etc.
+## 📖 API Documentation
 
-Options:
+The API documentation is generated with Springdoc OpenAPI.
 
--- 🖥️ Local (recommended for development): the repository includes a `docker-compose.yml` service for Postgres. To start a local Postgres instance:
+After starting the application, access:
 
-  1. Copy or create an `.env` with local credentials (see `.env.example`).
-  2. Start Postgres with Docker Compose:
-
-     ```bash
-     docker-compose up -d postgres
-     ```
-
-  3. The container exposes port 5432 by default. Use a JDBC URL like:
-
-     ```text
-     POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/ecommerce_db
-     POSTGRES_DB_USER=ecom_user
-     POSTGRES_DB_PASSWORD=secret
-     ```
-
--- ☁️ Hosted / VPS (Supabase): if you prefer a managed DB, set the environment variables from your provider. For Supabase you typically need the host, port, database, user and password. When using Supabase you may need to include `?sslmode=require` in the JDBC URL, for example:
-
-  ```text
-  POSTGRES_DB_URL=jdbc:postgresql://db.abcd.supabase.co:5432/postgres?sslmode=require
-  POSTGRES_DB_USER=postgres
-  POSTGRES_DB_PASSWORD=your_supabase_db_password
-  ```
-
-Notes:
-
-- The application reads `POSTGRES_DB_URL`, `POSTGRES_DB_USER` and `POSTGRES_DB_PASSWORD` from the environment or `.env` file (via `application.yml`).
-- Flyway migrations are included in `src/main/resources/db/migration` — when you run the app (or `./mvnw flyway:migrate`) Flyway will apply the migrations to the configured database.
-- Postgres and Redis services are defined together in the repository root `docker-compose.yml`. You can start both services at once with `docker-compose up -d` (or specify service names to start them individually).
-
----
-
-## ⚡ Redis — local or cloud (e.g. Redis Cloud)
-The application uses Redis for caching and session-related features. You can run Redis locally via Docker Compose or use a hosted provider such as Redis Cloud, AWS ElastiCache, Upstash, etc.
-
--- 🖥️ Local (Docker Compose): the included `docker-compose.yml` has a Redis service. Start it with:
-
-  ```bash
-  docker-compose up -d redis
-  ```
-
-  Or start both Postgres and Redis together:
-
-  ```bash
-  docker-compose up -d postgres redis
-  ```
-
--- ☁️ Hosted / Redis Cloud: set `REDIS_HOST` and `REDIS_PORT` (and any required auth) in your environment or `.env`. When using Redis Cloud or other managed providers, use the provided host, port and password. Example `.env` entries:
-
-  ```text
-  REDIS_HOST=your-redis-host.example.com
-  REDIS_PORT=6379
-  REDIS_PASSWORD=xxxxxxxx
-  ```
-
-Notes:
-
-- If you use a managed Redis service with TLS or special connection parameters, make sure to provide the proper client configuration in `application.yml` or environment variables.
-- Postgres and Redis are available in the same `docker-compose.yml` file at the repository root — running `docker-compose up -d` will bring both up. Use `docker-compose up -d postgres redis` to be explicit about which services to start.
-
----
-
-## 📖 Swagger / OpenAPI (API docs)
-The project uses `springdoc-openapi` (see `pom.xml`) to automatically generate OpenAPI docs. By default the UI is available at one of these URLs (depending on Springdoc version and configuration):
-
-- `/swagger-ui.html`
-- `/swagger-ui/index.html`
-- OpenAPI JSON at `/v3/api-docs`
-
-If the UI doesn't appear, check the `springdoc` configuration and application logs.
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
 ---
 
@@ -265,39 +299,22 @@ If the UI doesn't appear, check the `springdoc` configuration and application lo
 ### ✅ Pre-requisites
 - Java 21
 - Maven
-- Docker (optional)
+- Docker
 
 ### ▶️ Quick start (local dev)
+
 ```bash
-# Clone
 git clone https://github.com/LuisMiguelPerinotte/ecommerce-api.git
 cd ecommerce-api
 
-# Copy the example env file and edit values
-# Linux / macOS / Git Bash:
 cp .env.example .env
-# Windows (PowerShell):
-# Copy-Item .env.example .env
-# Windows (cmd.exe):
-# copy .env.example .env
 
-# Start services defined in docker-compose (Postgres and/or Redis)
-docker-compose up -d
+docker-compose up -d postgres redis
 
-# Run flyway migrations (optional, if not using docker)
-# On Linux / macOS / Git Bash:
-./mvnw flyway:migrate
-# On Windows (PowerShell / cmd):
-./mvnw.cmd flyway:migrate
-
-# Start the app
-# On Linux / macOS / Git Bash:
 ./mvnw spring-boot:run
-# On Windows (PowerShell / cmd):
-./mvnw.cmd spring-boot:run
 ```
 
-When running, check `http://localhost:8080/actuator/health` (if actuator enabled) and `http://localhost:8080/swagger-ui.html` (or `/swagger-ui/index.html`) for API docs.
+---
 
 ### 🐳 Running with Docker
 ```bash
@@ -307,13 +324,24 @@ docker-compose up --build
 ---
 
 ## 🧪 Testing
-To run tests locally:
+The project includes automated tests focused on validating core business rules and service behavior.
+
+Current test coverage includes:
+
+- User registration flow
+- Password encryption
+- Automatic cart creation
+- Product management rules
+- Cart item manipulation
+- Stock validation
+- Exception scenarios
+- Repository behavior
+
+To run the tests:
 
 ```bash
 ./mvnw test
 ```
-
-Add or expand test suites in `src/test/java/...` as the project grows.
 
 ---
 
@@ -324,24 +352,3 @@ Add or expand test suites in `src/test/java/...` as the project grows.
 4. Push to your fork and open a Pull Request
 
 Please include clear descriptions, tests for new logic, and keep commits atomic.
-
----
-
-
-## FAQ ❓
-
-**Q: Can I use another database?**
-
-A: Yes — the app uses Spring Data JPA with Postgres by default. Configure `POSTGRES_DB_URL`, `POSTGRES_DB_USER` and `POSTGRES_DB_PASSWORD` to point to your desired Postgres host.
-
-**Q: How do I get a Stripe Api Key?**
-
-A: Register at [Stripe](https://stripe.com/br) and create an app to obtain credentials. Put them in `STRIPE_API_KEY` and related environment variables.
-
-**Q: Where can I change JWT settings?**
-
-A: JWT configuration is read from environment variables (`JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION`) and mapped in `application.yml` — override them per profile if needed.
-
----
-
-> ⚠️ **Note:** This documentation is under construction and will be updated as the project evolves.
