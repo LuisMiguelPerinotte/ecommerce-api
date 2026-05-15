@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.application.config;
+package com.java.luismiguel.ecommerce_api.infrastructure.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

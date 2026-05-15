@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.application.config;
+package com.java.luismiguel.ecommerce_api.infrastructure.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

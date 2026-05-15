@@ -1,4 +1,4 @@
-package com.java.luismiguel.ecommerce_api.application.config;
+package com.java.luismiguel.ecommerce_api.infrastructure.config;
 
 import com.stripe.Stripe;
 import jakarta.annotation.PostConstruct;
