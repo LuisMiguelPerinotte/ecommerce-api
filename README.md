@@ -294,6 +294,17 @@ After starting the application, access:
 
 ---
 
+## 🌐 Live Demo
+
+The API is deployed on Render and can be accessed through the links below:
+
+- **Base URL:** `https://ecommerce-api-gv78.onrender.com`
+- **Swagger UI:** `https://ecommerce-api-gv78.onrender.com/swagger-ui/index.html`
+
+> Note: The application may take a few seconds to respond on the first request because it is hosted on a free Render instance.
+
+---
+
 ## 🏁 Getting Started
 
 ### ✅ Pre-requisites
@@ -342,7 +353,6 @@ To run the tests:
 ```bash
 ./mvnw test
 ```
-
 ---
 
 ## Contributing 🤝
