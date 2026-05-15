@@ -7,17 +7,16 @@
 
 ---
 
-## Overview
-E-Commerce API is a backend RESTful service for online stores,
-built with Java and Spring Boot. It provides endpoints for user management,
-product catalog, shopping cart, order processing, and payment integration.
-The project is designed for learning, experimentation, and as a foundation for real-world e-commerce solutions.
+## ✨ Overview
+E-Commerce API is a backend RESTful service for online stores built with Java and Spring Boot.
+It exposes endpoints for user management, product catalog, shopping cart, order processing and payment integration.
+The codebase is structured to be modular and easy to extend — suitable as a learning project or a starting point for production systems.
 
-> **Project Status:** In development 🚧 — Contributions and suggestions are welcome!
+> **Project Status:** In development 🚧 — contributions, issues and pull requests are welcome.
 
 ---
 
-## Motivation
+## 💡 Motivation
 This project aims to:
 - Demonstrate best practices in Java/Spring Boot API development
 - Serve as a portfolio piece for backend engineering
@@ -25,39 +24,66 @@ This project aims to:
 
 ---
 
-## Features
+## 🚀 Features
 | Feature                        | Status      | Description                                 |
 |------------------------------- |-------------|---------------------------------------------|
-| User registration/login        | Implemented | JWT-based authentication and authorization  |
-| Product management             | Implemented | CRUD for products and categories            |
-| Shopping cart                  | Implemented | Add/remove/update items, view cart          |
-| Order processing               | Implemented | Place orders, order history                 |
-| Payment integration            | Implemented | Stripe gateway integration                  |
-| Address management             | Implemented | Manage shipping addresses                   |
-| Admin panel                    | Implemented | Admin endpoints for managing catalog/users  |
-| API documentation (Swagger)    | Implemented | Interactive API docs with Springdoc/OpenAPI |
-| Automated tests                | In Progress | Unit and integration tests                  |
+| 👥 User registration/login     | Implemented | JWT-based authentication and authorization  |
+| 📦 Product management          | Implemented | CRUD for products and categories            |
+| 🧺 Shopping cart               | Implemented | Add/remove/update items, view cart          |
+| 🧾 Order processing            | Implemented | Place orders, order history                 |
+| 💳 Payment integration         | Implemented | Stripe gateway integration                  |
+| 🏠 Address management          | Implemented | Manage shipping addresses                   |
+| 🛠️ Admin panel                | Implemented | Admin endpoints for managing catalog/users  |
+| 📚 API documentation (Swagger) | Implemented | Interactive API docs with Springdoc/OpenAPI |
+| ✅ Automated tests             | In Progress | Unit and integration tests                  |
 
 ---
 
-## Architecture
-- **Spring Boot**: Main framework for REST API
-- **Spring Data JPA**: ORM and database access
-- **Flyway**: Database migrations
-- **JWT**: Secure authentication
-- **Docker**: Containerization for easy deployment
-- **PostgreSQL**: Default database (can be swapped)
+## Architecture 🏗️
+- 🌱 **Spring Boot**: Main framework for REST API
+- 🗄️ **Spring Data JPA**: ORM and database access
+- 🧭 **Flyway**: Database migrations
+- 🔐 **JWT**: Secure authentication
+- 🐳 **Docker**: Containerization for easy deployment
+- 🐘 **PostgreSQL**: Default database (can be swapped)
 
-### Directory Structure
+### 🗂️ Directory Structure
 ```
-src/
-  main/
-    java/com/java/luismiguel/ecommerce_api/...
-    resources/
-      application.yml
-      db/migration/
-  test/
-    java/com/java/luismiguel/ecommerce_api/...
+<repo-root>/
+├─ pom.xml                      # Maven build file: dependencies, plugins, build lifecycle
+├─ mvnw, mvnw.cmd               # Maven wrapper: run Maven without installing it globally
+├─ Dockerfile                   # Image build instructions for the application
+├─ docker-compose.yml          # Compose stack (Postgres, Redis) used for local development
+├─ README.md                    # Project documentation (this file)
+├─ LICENSE                      # Project license (MIT)
+├─ .env.example                 # Example env vars used by application.yml via config.import
+├─ .gitignore                   # Files/dirs ignored by Git
+└─ src/
+   ├─ main/
+   │  ├─ java/
+   │  │  └─ com/java/luismiguel/ecommerce_api/
+   │  │     ├─ EcommerceApiApplication.java   # Spring Boot entrypoint (main method)
+   │  │     ├─ api/                           # HTTP layer (controllers, request/response DTOs)
+   │  │     │  ├─ controller/                 # REST controllers, mapping endpoints
+   │  │     │  └─ dto/                        # DTOs for requests and responses
+   │  │     ├─ application/                   # service implementations
+   │  │     ├─ domain/                        # JPA entities, repositories and enums
+   │  │     └─ infrastructure/                # Integrations & technical implementations
+   │  │        ├─ client/                     # External clients
+   │  │        ├─ config/                     # Spring configuration classes
+   │  │        ├─ exception/                  # Exception types and handlers (GlobalExceptionHandler)
+   │  │        └─ security/                   # Security Config and JWT
+   │  └─ resources/
+   │     ├─ application.yml                  # Main configuration (reads env vars)
+   │     ├─ db/
+   │     │  └─ migration/                    # Flyway SQL migrations (V1__, V2__, ...)
+   │     ├─ static/                          # Static assets served by Spring (if any)
+   │     └─ templates/                       # Template views (thymeleaf/free marker) if used
+   └─ test/
+      ├─ java/
+      │  └─ com/java/luismiguel/             # Unit and integration tests mirroring main packages
+      └─ resources/
+         └─ application-test.yml             # Test properties
 ```
 
 ---
@@ -117,46 +143,113 @@ Notes:
 
 ---
 
-## Database — Supabase (current setup) and alternatives
-In this project the database is running on Supabase (Postgres). Supabase provides a hosted Postgres instance; to use it:
-1. Create a Supabase project
-2. From the project dashboard, copy the DB connection details (host, port, database, user, password)
-3. Fill the `.env` or environment variables accordingly (see examples above)
 
-If you prefer another host (local Postgres, AWS RDS, ElephantSQL, DigitalOcean, etc.), simply set `POSTGRES_DB_URL`, `POSTGRES_DB_USER` and `POSTGRES_DB_PASSWORD` accordingly. The code uses standard Spring Data JPA, so switching the Postgres host requires no code changes.
+## 🧰 Stack
 
-Example local Postgres JDBC URL:
-```text
-POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/ecommerce_db
-POSTGRES_DB_USER=ecom_user
-POSTGRES_DB_PASSWORD=secret
-```
+### ⚙️ Languages & Runtimes
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+
+### 🧩 Frameworks & Libraries
+
+![Spring](https://img.shields.io/badge/Spring%20Boot-6DB33F.svg?style=for-the-badge&logo=Spring-Boot&logoColor=white)
+![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white)
+![Flyway](https://img.shields.io/badge/Flyway-CC0200.svg?style=for-the-badge&logo=Flyway&logoColor=white)
+![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
+![JUnit5](https://img.shields.io/badge/JUnit5-f5f5f5?style=for-the-badge&logo=junit5&logoColor=dc524a)
+
+### 🔒 Security
+
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F.svg?style=for-the-badge&logo=Spring-Security&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+
+### 🗃️ Database & Cache
+
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![H2](https://img.shields.io/badge/H2%20Database-09476B.svg?style=for-the-badge&logo=H2-Database&logoColor=white)
+
+### 🚀 DevOps & Containerization
+
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Maven](https://img.shields.io/badge/Apache%20Maven-C71A36.svg?style=for-the-badge&logo=Apache-Maven&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=GitHub-Actions&logoColor=white)
+
+### 💳 Payments & Integrations
+
+![Stripe](https://img.shields.io/badge/Stripe-5469d4?style=for-the-badge&logo=stripe&logoColor=ffffff)
 
 ---
 
-## Redis — local container (default) or cloud
-This project uses Redis for caching/sessions (Reactive Redis client). In development I run Redis locally inside a container (referenced in `docker-compose.yml`), but you can use a managed Redis (AWS Elasticache, Upstash, Redis Labs, etc.) in production.
+## 🗃️ Database — local or hosted (e.g. Supabase)
+This project supports running Postgres either locally (via Docker Compose) or using a hosted Postgres service such as Supabase, AWS RDS, ElephantSQL, DigitalOcean, etc.
 
-Local Docker Compose snippet (example - you may already have similar service in `docker-compose.yml`):
+Options:
 
-```yaml
-services:
-  redis:
-    image: redis:7-alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - redis-data:/data
+-- 🖥️ Local (recommended for development): the repository includes a `docker-compose.yml` service for Postgres. To start a local Postgres instance:
 
-volumes:
-  redis-data:
-```
+  1. Copy or create an `.env` with local credentials (see `.env.example`).
+  2. Start Postgres with Docker Compose:
 
-To use a hosted Redis, update `REDIS_HOST` and `REDIS_PORT` in your `.env` or environment.
+     ```bash
+     docker-compose up -d postgres
+     ```
+
+  3. The container exposes port 5432 by default. Use a JDBC URL like:
+
+     ```text
+     POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/ecommerce_db
+     POSTGRES_DB_USER=ecom_user
+     POSTGRES_DB_PASSWORD=secret
+     ```
+
+-- ☁️ Hosted / VPS (Supabase): if you prefer a managed DB, set the environment variables from your provider. For Supabase you typically need the host, port, database, user and password. When using Supabase you may need to include `?sslmode=require` in the JDBC URL, for example:
+
+  ```text
+  POSTGRES_DB_URL=jdbc:postgresql://db.abcd.supabase.co:5432/postgres?sslmode=require
+  POSTGRES_DB_USER=postgres
+  POSTGRES_DB_PASSWORD=your_supabase_db_password
+  ```
+
+Notes:
+
+- The application reads `POSTGRES_DB_URL`, `POSTGRES_DB_USER` and `POSTGRES_DB_PASSWORD` from the environment or `.env` file (via `application.yml`).
+- Flyway migrations are included in `src/main/resources/db/migration` — when you run the app (or `./mvnw flyway:migrate`) Flyway will apply the migrations to the configured database.
+- Postgres and Redis services are defined together in the repository root `docker-compose.yml`. You can start both services at once with `docker-compose up -d` (or specify service names to start them individually).
 
 ---
 
-## Swagger / OpenAPI (API docs)
+## ⚡ Redis — local or cloud (e.g. Redis Cloud)
+The application uses Redis for caching and session-related features. You can run Redis locally via Docker Compose or use a hosted provider such as Redis Cloud, AWS ElastiCache, Upstash, etc.
+
+-- 🖥️ Local (Docker Compose): the included `docker-compose.yml` has a Redis service. Start it with:
+
+  ```bash
+  docker-compose up -d redis
+  ```
+
+  Or start both Postgres and Redis together:
+
+  ```bash
+  docker-compose up -d postgres redis
+  ```
+
+-- ☁️ Hosted / Redis Cloud: set `REDIS_HOST` and `REDIS_PORT` (and any required auth) in your environment or `.env`. When using Redis Cloud or other managed providers, use the provided host, port and password. Example `.env` entries:
+
+  ```text
+  REDIS_HOST=your-redis-host.example.com
+  REDIS_PORT=6379
+  REDIS_PASSWORD=xxxxxxxx
+  ```
+
+Notes:
+
+- If you use a managed Redis service with TLS or special connection parameters, make sure to provide the proper client configuration in `application.yml` or environment variables.
+- Postgres and Redis are available in the same `docker-compose.yml` file at the repository root — running `docker-compose up -d` will bring both up. Use `docker-compose up -d postgres redis` to be explicit about which services to start.
+
+---
+
+## 📖 Swagger / OpenAPI (API docs)
 The project uses `springdoc-openapi` (see `pom.xml`) to automatically generate OpenAPI docs. By default the UI is available at one of these URLs (depending on Springdoc version and configuration):
 
 - `/swagger-ui.html`
@@ -167,43 +260,53 @@ If the UI doesn't appear, check the `springdoc` configuration and application lo
 
 ---
 
-## Getting Started
+## 🏁 Getting Started
 
-### Pre-requisites
+### ✅ Pre-requisites
 - Java 21
 - Maven
 - Docker (optional)
 
-### Quick start (local dev)
+### ▶️ Quick start (local dev)
 ```bash
 # Clone
 git clone https://github.com/LuisMiguelPerinotte/ecommerce-api.git
 cd ecommerce-api
 
-# Copy env example and edit
+# Copy the example env file and edit values
+# Linux / macOS / Git Bash:
 cp .env.example .env
-# Edit .env with your credentials (e.g. supabase or local DB)
+# Windows (PowerShell):
+# Copy-Item .env.example .env
+# Windows (cmd.exe):
+# copy .env.example .env
 
-# Start Redis locally (optional) and other containers
-docker-compose up -d redis
+# Start services defined in docker-compose (Postgres and/or Redis)
+docker-compose up -d
 
 # Run flyway migrations (optional, if not using docker)
+# On Linux / macOS / Git Bash:
 ./mvnw flyway:migrate
+# On Windows (PowerShell / cmd):
+./mvnw.cmd flyway:migrate
 
 # Start the app
+# On Linux / macOS / Git Bash:
 ./mvnw spring-boot:run
+# On Windows (PowerShell / cmd):
+./mvnw.cmd spring-boot:run
 ```
 
 When running, check `http://localhost:8080/actuator/health` (if actuator enabled) and `http://localhost:8080/swagger-ui.html` (or `/swagger-ui/index.html`) for API docs.
 
-### Running with Docker
+### 🐳 Running with Docker
 ```bash
 docker-compose up --build
 ```
 
 ---
 
-## Testing
+## 🧪 Testing
 To run tests locally:
 
 ```bash
@@ -214,7 +317,7 @@ Add or expand test suites in `src/test/java/...` as the project grows.
 
 ---
 
-## Contributing
+## Contributing 🤝
 1. Fork the repository
 2. Create a new branch (`git checkout -b feature/your-feature`)
 3. Commit your changes
@@ -224,21 +327,21 @@ Please include clear descriptions, tests for new logic, and keep commits atomic.
 
 ---
 
-## FAQ
+
+## FAQ ❓
+
 **Q: Can I use another database?**
-A: Yes — the app uses Spring Data JPA with Postgres. Configure `POSTGRES_DB_URL` and credentials to point to your host.
+
+A: Yes — the app uses Spring Data JPA with Postgres by default. Configure `POSTGRES_DB_URL`, `POSTGRES_DB_USER` and `POSTGRES_DB_PASSWORD` to point to your desired Postgres host.
 
 **Q: How do I get a Stripe Api Key?**
-A: Register at [Stripe](https://stripe.com/br) and create an app to get your credentials. Put them in `STRIPE_API_KEY` and related env vars.
+
+A: Register at [Stripe](https://stripe.com/br) and create an app to obtain credentials. Put them in `STRIPE_API_KEY` and related environment variables.
 
 **Q: Where can I change JWT settings?**
-A: In your environment variables (`JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION`) or override them in `application.yml` for each profile.
+
+A: JWT configuration is read from environment variables (`JWT_SECRET`, `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION`) and mapped in `application.yml` — override them per profile if needed.
 
 ---
 
-## Contact
-Created by [Luís Miguel](https://github.com/LuísMiguelPerinotte) — feel free to reach out!
-
----
-
-> **Note:** This documentation is under construction and will be updated as the project evolves.
+> ⚠️ **Note:** This documentation is under construction and will be updated as the project evolves.
