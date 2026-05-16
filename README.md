@@ -12,8 +12,8 @@
 ![JWT](https://img.shields.io/badge/JWT-Authentication-black?logo=jsonwebtokens&logoColor=white)
 ![Flyway](https://img.shields.io/badge/Flyway-Migrations-CC0200?logo=flyway&logoColor=white)
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## ✨ Overview
 E-Commerce API is a RESTful backend application built with Java 21 and Spring Boot.
 
@@ -23,8 +23,8 @@ The project was developed as a backend portfolio project, focusing on layered ar
 
 > **Project Status:** In development 🚧 — contributions, issues and pull requests are welcome.
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 💡 Motivation
 
 The goal of this project is to simulate the backend of a real e-commerce application while applying common backend engineering practices, such as:
@@ -37,8 +37,8 @@ The goal of this project is to simulate the backend of a real e-commerce applica
 - Automated testing
 - API documentation
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🚀 Features
 | Feature                          | Status     | Description                                        |
 |----------------------------------|------------|----------------------------------------------------|
@@ -52,8 +52,8 @@ The goal of this project is to simulate the backend of a real e-commerce applica
 | 📚 API documentation (Swagger)   | Implemented | Interactive API docs with Springdoc/OpenAPI        |
 | ✅ Automated tests                | In Progress | Unit and integration tests for core business rules |
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 📌 Business Rules
 
 - A user cannot register with an email that is already in use.
@@ -67,8 +67,8 @@ The goal of this project is to simulate the backend of a real e-commerce applica
 - Common users cannot access administrative endpoints.
 - Admin users cannot change their own role.
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🏗️ Architecture
 
 The project follows a layered architecture to separate responsibilities and keep the codebase easier to maintain and test.
@@ -110,8 +110,8 @@ flowchart LR
     Webhook -->|Process Payment Event| Service
 ```
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🧠 Technical Decisions
 
 - **JWT authentication** was used to keep the API stateless and protect private endpoints.
@@ -122,8 +122,8 @@ flowchart LR
 - **Global exception handling** centralizes API error responses and keeps controllers cleaner.
 - **Layered architecture** separates HTTP concerns, business logic, domain models and infrastructure details.
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🧩 Entity Relationship Diagram
 The diagram below represents the main entities and relationships in the e-commerce domain.
 
@@ -247,8 +247,8 @@ erDiagram
     PAYMENT }o--|| "ORDER" : "for"
 ```
 
----
 
+&nbsp;&nbsp;&nbsp;
 ### 🗂️ Directory Structure
 ```
  src/main/java/com/java/luismiguel/ecommerce_api
@@ -258,8 +258,8 @@ erDiagram
 └── infrastructure   # Security, exceptions, configs and integrations
 ```
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## ⚙️ Configuration
 
 The application uses environment variables for database, cache, JWT and Stripe configuration.
@@ -293,8 +293,8 @@ STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
 For hosted databases, configure the same variables using your provider credentials.
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🗃️ Database & Cache
 
 The application uses **PostgreSQL** as the main database and **Redis** as a cache layer.
@@ -307,8 +307,8 @@ Both services can be started locally with Docker Compose:
 docker-compose up -d postgres redis
 ```
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 📖 API Documentation
 
 The API documentation is generated with Springdoc OpenAPI.
@@ -318,8 +318,8 @@ After starting the application, access:
 - Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🌐 Live Demo
 
 The API is deployed on Render and can be accessed through the links below:
@@ -329,8 +329,8 @@ The API is deployed on Render and can be accessed through the links below:
 
 > Note: The application may take a few seconds to respond on the first request because it is hosted on a free Render instance.
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🏁 Getting Started
 
 ### ✅ Pre-requisites
@@ -351,15 +351,14 @@ docker-compose up -d postgres redis
 ./mvnw spring-boot:run
 ```
 
----
 
 ### 🐳 Running with Docker
 ```bash
 docker-compose up --build
 ```
 
----
 
+&nbsp;&nbsp;&nbsp;
 ## 🧪 Testing
 The project includes automated tests focused on validating core business rules and service behavior.
 
@@ -379,8 +378,9 @@ To run the tests:
 ```bash
 ./mvnw test
 ```
----
 
+
+&nbsp;&nbsp;&nbsp;
 ## Contributing 🤝
 1. Fork the repository
 2. Create a new branch (`git checkout -b feature/your-feature`)
