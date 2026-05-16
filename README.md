@@ -80,8 +80,34 @@ The project follows a layered architecture to separate responsibilities and keep
 
 Main flow:
 
-```txt
-Controller → Service → Repository → Database
+```mermaid
+flowchart LR
+    Client[Client / Frontend]
+
+    subgraph API[Application]
+        Controller[REST Controller]
+        Service[Application Service Layer]
+        Domain[Domain Entities]
+        Repository[JPA Repository]
+        Webhook[Stripe Webhook Controller]
+    end
+
+    Database[(PostgreSQL)]
+    Redis[(Redis)]
+    Stripe[Stripe API]
+
+    Client -->|HTTP Request| Controller
+    Controller -->|Request DTO| Service
+
+    Service -->|Business Logic| Domain
+    Service -->|Query / Persist| Repository
+    Repository -->|SQL| Database
+
+    Service -->|Cache Read / Write| Redis
+
+    Service -->|Create Checkout Session| Stripe
+    Stripe -->|Webhook Event| Webhook
+    Webhook -->|Process Payment Event| Service
 ```
 
 ---
