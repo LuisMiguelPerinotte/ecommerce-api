@@ -2,12 +2,12 @@ package com.java.luismiguel.ecommerce_api.application.payment;
 
 import com.java.luismiguel.ecommerce_api.api.dto.payment.response.CheckoutResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.order.Order;
-import com.java.luismiguel.ecommerce_api.domain.order.OrderItem;
 import com.java.luismiguel.ecommerce_api.domain.order.OrderRepository;
 import com.java.luismiguel.ecommerce_api.domain.order.enums.OrderStatus;
 import com.java.luismiguel.ecommerce_api.domain.payment.Payment;
 import com.java.luismiguel.ecommerce_api.domain.payment.PaymentRepository;
 import com.java.luismiguel.ecommerce_api.domain.payment.enums.PaymentStatus;
+import com.java.luismiguel.ecommerce_api.infrastructure.client.stripe.StripeCheckoutClient;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.order.OrderNotFoundException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.payment.*;
 import com.stripe.exception.EventDataObjectDeserializationException;
@@ -16,13 +16,10 @@ import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
-import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -32,14 +29,16 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentPersistenceService paymentPersistenceService;
     private final PaymentRepository paymentRepository;
+    private final StripeCheckoutClient stripeCheckoutClient;
 
     private static final Set<OrderStatus> PAYABLE_STATUSES = Set.of(OrderStatus.PENDING, OrderStatus.PAYMENT_FAILED);
     private static final Set<PaymentStatus> EXPIRATION_STATUSES = Set.of(PaymentStatus.CREATED, PaymentStatus.FAILED);
 
-    public PaymentService(OrderRepository orderRepository, PaymentPersistenceService paymentPersistenceService, PaymentRepository paymentRepository) {
+    public PaymentService(OrderRepository orderRepository, PaymentPersistenceService paymentPersistenceService, PaymentRepository paymentRepository, StripeCheckoutClient stripeCheckoutClient) {
         this.orderRepository = orderRepository;
         this.paymentPersistenceService = paymentPersistenceService;
         this.paymentRepository = paymentRepository;
+        this.stripeCheckoutClient = stripeCheckoutClient;
     }
 
     public CheckoutResponseDTO createCheckout(UUID orderId, UUID userId) {
@@ -59,26 +58,9 @@ public class PaymentService {
             throw new OrderCannotBePaidException();
         }
 
-
-        List<SessionCreateParams.LineItem> items = createLineItemList(order);
-
-        SessionCreateParams params =
-                SessionCreateParams.builder()
-                        .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setClientReferenceId(orderId.toString())
-                        .setPaymentIntentData(
-                                SessionCreateParams.PaymentIntentData.builder()
-                                        .putMetadata("orderId", orderId.toString())
-                                        .build()
-                        )
-                        .addAllLineItem(items)
-                        .setSuccessUrl("http://localhost:8080/success")
-                        .setCancelUrl("http://localhost:8080/cancel")
-                        .addExpand("payment_intent")
-                        .build();
-
         try {
-            Session session = Session.create(params);
+            Session session = stripeCheckoutClient.createCheckoutSession(order);
+
             Payment payment = Payment.builder()
                     .stripeSessionId(session.getId())
                     .order(order)
@@ -99,43 +81,6 @@ public class PaymentService {
             log.info("Error Creating Checkout for Order ID: {}", orderId);
             throw new ErrorCreatingCheckoutException();
         }
-    }
-
-
-    private List<SessionCreateParams.LineItem> createLineItemList(Order order) {
-        List<SessionCreateParams.LineItem> items = new ArrayList<>();
-
-        for (OrderItem item : order.getItems()) {
-            Long productQuantity = item.getQuantity().longValue();
-            String productName = item.getProductName();
-            Long unitAmount = item.getUnitPrice()
-                    .multiply(new BigDecimal("100"))
-                    .setScale(0, RoundingMode.HALF_UP)
-                    .longValue();
-
-
-            SessionCreateParams.LineItem.PriceData.ProductData productData =
-                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                            .setName(productName)
-                            .build();
-
-            SessionCreateParams.LineItem.PriceData priceData =
-                    SessionCreateParams.LineItem.PriceData.builder()
-                            .setCurrency("brl")
-                            .setUnitAmount(unitAmount)
-                            .setProductData(productData)
-                            .build();
-
-            SessionCreateParams.LineItem lineItem =
-                    SessionCreateParams
-                            .LineItem.builder()
-                            .setQuantity(productQuantity)
-                            .setPriceData(priceData)
-                            .build();
-
-            items.add(lineItem);
-        }
-        return items;
     }
 
 
@@ -170,6 +115,7 @@ public class PaymentService {
             }
         }
     }
+
 
     @Transactional
     public void processPaymentFailed(Event event) {
@@ -209,6 +155,7 @@ public class PaymentService {
                     payment.getPaymentId(), order.getOrderId(), failureReason);
         }
     }
+
 
     @Transactional
     public void processPaymentExpired(Event event) {
