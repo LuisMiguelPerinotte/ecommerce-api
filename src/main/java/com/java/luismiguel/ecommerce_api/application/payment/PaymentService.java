@@ -142,8 +142,12 @@ public class PaymentService {
                 return;
             }
 
-            String failureReason = paymentIntent.getLastPaymentError().getDeclineCode();
-            if (failureReason == null) failureReason = "unknown";
+            String failureReason = "unknown";
+
+            if (paymentIntent.getLastPaymentError() != null &&
+                    paymentIntent.getLastPaymentError().getDeclineCode() != null) {
+                failureReason = paymentIntent.getLastPaymentError().getDeclineCode();
+            }
 
             payment.setStatus(PaymentStatus.FAILED);
             payment.setFailedAt(LocalDateTime.now());
