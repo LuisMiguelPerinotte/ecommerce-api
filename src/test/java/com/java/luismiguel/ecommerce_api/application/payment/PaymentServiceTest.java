@@ -14,6 +14,10 @@ import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.payme
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.payment.OrderCannotBePaidException;
 import com.java.luismiguel.ecommerce_api.infrastructure.exception.business.payment.PaymentIsAlreadyInProgressException;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.PaymentIntent;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +30,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -237,5 +243,396 @@ public class PaymentServiceTest {
             then(paymentPersistenceService).should(never())
                     .savePaymentAndOrder(any(Payment.class), any(Order.class));
         }
+    }
+
+
+    @Nested
+    @DisplayName("processCheckoutCompleted")
+    class ProcessCheckoutCompleted {
+        UUID paymentId;
+        UUID orderId;
+
+        @BeforeEach
+        void setUp() {
+            paymentId = UUID.randomUUID();
+            orderId = UUID.randomUUID();
+        }
+
+        @Test
+        @DisplayName("Should Process Checkout Completed Successfully")
+        void shouldProcessCheckoutCompletedSuccessfully() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+            given(session.getPaymentStatus()).willReturn("paid");
+
+            Event event = mockStripeEventWithObject(session);
+
+            Order order = Order.builder()
+                    .orderId(orderId)
+                    .orderStatus(OrderStatus.AWAITING_PAYMENT)
+                    .build();
+
+            Payment payment = Payment.builder()
+                    .paymentId(paymentId)
+                    .stripeSessionId("cs_test_123")
+                    .status(PaymentStatus.CREATED)
+                    .order(order)
+                    .build();
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.of(payment));
+
+            // when
+            paymentService.processCheckoutCompleted(event);
+
+            // then
+            assertThat(payment.getStatus()).isEqualTo(PaymentStatus.APPROVED);
+            assertThat(payment.getPaidAt()).isNotNull();
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.PAID);
+
+            then(paymentRepository).should().save(payment);
+            then(orderRepository).should().save(order);
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Checkout Is Not Paid")
+        void shouldIgnoreWhenCheckoutIsNotPaid() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getPaymentStatus()).willReturn("unpaid");
+
+            Event event = mockStripeEventWithObject(session);
+
+            // when
+            paymentService.processCheckoutCompleted(event);
+
+            // then
+            then(paymentRepository).should(never()).findByStripeSessionIdWithOrder(any());
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Payment Not Found")
+        void shouldIgnoreWhenPaymentNotFound() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+            given(session.getPaymentStatus()).willReturn("paid");
+
+            Event event = mockStripeEventWithObject(session);
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.empty());
+
+            // when
+            paymentService.processCheckoutCompleted(event);
+
+            // then
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Payment Is Already Approved")
+        void shouldIgnoreWhenPaymentIsAlreadyApproved() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+            given(session.getPaymentStatus()).willReturn("paid");
+
+            Event event = mockStripeEventWithObject(session);
+
+            Order order = Order.builder()
+                    .orderId(orderId)
+                    .orderStatus(OrderStatus.PAID)
+                    .build();
+
+            Payment payment = Payment.builder()
+                    .paymentId(paymentId)
+                    .stripeSessionId("cs_test_123")
+                    .status(PaymentStatus.APPROVED)
+                    .order(order)
+                    .build();
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.of(payment));
+
+            // when
+            paymentService.processCheckoutCompleted(event);
+
+            // then
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+    }
+
+
+    @Nested
+    @DisplayName("processPaymentExpired")
+    class ProcessPaymentExpired {
+        UUID paymentId;
+        UUID orderId;
+
+        @BeforeEach
+        void setUp() {
+            paymentId = UUID.randomUUID();
+            orderId = UUID.randomUUID();
+        }
+
+        @Test
+        @DisplayName("Should Process Payment Expired Successfully")
+        void shouldProcessPaymentExpiredSuccessfully() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+
+            Event event = mockStripeEventWithObject(session);
+
+            Order order = Order.builder()
+                    .orderId(orderId)
+                    .orderStatus(OrderStatus.AWAITING_PAYMENT)
+                    .build();
+
+            Payment payment = Payment.builder()
+                    .paymentId(paymentId)
+                    .stripeSessionId("cs_test_123")
+                    .status(PaymentStatus.CREATED)
+                    .order(order)
+                    .build();
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.of(payment));
+
+            // when
+            paymentService.processPaymentExpired(event);
+
+            // then
+            assertThat(payment.getStatus()).isEqualTo(PaymentStatus.EXPIRED);
+            assertThat(payment.getFailedAt()).isNotNull();
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.PAYMENT_FAILED);
+
+            then(paymentRepository).should().save(payment);
+            then(orderRepository).should().save(order);
+        }
+
+
+        @Test
+        @DisplayName("Should Process Failed Payment Expired Successfully")
+        void shouldProcessFailedPaymentExpiredSuccessfully() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+
+            Event event = mockStripeEventWithObject(session);
+
+            Order order = Order.builder()
+                    .orderId(orderId)
+                    .orderStatus(OrderStatus.AWAITING_PAYMENT)
+                    .build();
+
+            Payment payment = Payment.builder()
+                    .paymentId(paymentId)
+                    .stripeSessionId("cs_test_123")
+                    .status(PaymentStatus.FAILED)
+                    .order(order)
+                    .build();
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.of(payment));
+
+            // when
+            paymentService.processPaymentExpired(event);
+
+            // then
+            assertThat(payment.getStatus()).isEqualTo(PaymentStatus.EXPIRED);
+            assertThat(payment.getFailedAt()).isNotNull();
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.PAYMENT_FAILED);
+
+            then(paymentRepository).should().save(payment);
+            then(orderRepository).should().save(order);
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Expired Payment Not Found")
+        void shouldIgnoreWhenExpiredPaymentNotFound() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+
+            Event event = mockStripeEventWithObject(session);
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.empty());
+
+            // when
+            paymentService.processPaymentExpired(event);
+
+            // then
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Payment Status Cannot Expire")
+        void shouldIgnoreWhenPaymentStatusCannotExpire() {
+            // given
+            Session session = mock(Session.class);
+
+            given(session.getId()).willReturn("cs_test_123");
+
+            Event event = mockStripeEventWithObject(session);
+
+            Order order = Order.builder()
+                    .orderId(orderId)
+                    .orderStatus(OrderStatus.PAID)
+                    .build();
+
+            Payment payment = Payment.builder()
+                    .paymentId(paymentId)
+                    .stripeSessionId("cs_test_123")
+                    .status(PaymentStatus.APPROVED)
+                    .order(order)
+                    .build();
+
+            given(paymentRepository.findByStripeSessionIdWithOrder("cs_test_123"))
+                    .willReturn(Optional.of(payment));
+
+            // when
+            paymentService.processPaymentExpired(event);
+
+            // then
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+    }
+
+
+    @Nested
+    @DisplayName("processPaymentFailed")
+    class ProcessPaymentFailed {
+        UUID paymentId;
+        UUID orderId;
+
+        @BeforeEach
+        void setUp() {
+            paymentId = UUID.randomUUID();
+            orderId = UUID.randomUUID();
+        }
+
+        @Test
+        @DisplayName("Should Process Payment Failed With Unknown Reason When Last Payment Error Is Null")
+        void shouldProcessPaymentFailedWithUnknownReasonWhenLastPaymentErrorIsNull() {
+            // given
+            PaymentIntent paymentIntent = mock(PaymentIntent.class);
+
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("orderId", orderId.toString());
+
+            given(paymentIntent.getMetadata()).willReturn(metadata);
+            given(paymentIntent.getLastPaymentError()).willReturn(null);
+
+            Event event = mockStripeEventWithObject(paymentIntent);
+
+            Order order = Order.builder()
+                    .orderId(orderId)
+                    .orderStatus(OrderStatus.AWAITING_PAYMENT)
+                    .build();
+
+            Payment payment = Payment.builder()
+                    .paymentId(paymentId)
+                    .status(PaymentStatus.CREATED)
+                    .order(order)
+                    .build();
+
+            given(paymentRepository.findPaymentByOrderIdAndStatusWithOrder(orderId, PaymentStatus.CREATED))
+                    .willReturn(Optional.of(payment));
+
+            // when
+            paymentService.processPaymentFailed(event);
+
+            // then
+            assertThat(payment.getStatus()).isEqualTo(PaymentStatus.FAILED);
+            assertThat(payment.getFailedAt()).isNotNull();
+            assertThat(payment.getFailureReason()).isEqualTo("unknown");
+
+            then(paymentRepository).should().save(payment);
+            then(orderRepository).should().save(order);
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Payment Failed Has No Order Id")
+        void shouldIgnoreWhenPaymentFailedHasNoOrderId() {
+            // given
+            PaymentIntent paymentIntent = mock(PaymentIntent.class);
+
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("orderId", "");
+
+            given(paymentIntent.getMetadata()).willReturn(metadata);
+
+            Event event = mockStripeEventWithObject(paymentIntent);
+
+            // when
+            paymentService.processPaymentFailed(event);
+
+            // then
+            then(paymentRepository).should(never())
+                    .findPaymentByOrderIdAndStatusWithOrder(any(UUID.class), any(PaymentStatus.class));
+
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+
+
+        @Test
+        @DisplayName("Should Ignore When Failed Payment Not Found")
+        void shouldIgnoreWhenFailedPaymentNotFound() {
+            // given
+            PaymentIntent paymentIntent = mock(PaymentIntent.class);
+
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("orderId", orderId.toString());
+
+            given(paymentIntent.getMetadata()).willReturn(metadata);
+
+            Event event = mockStripeEventWithObject(paymentIntent);
+
+            given(paymentRepository.findPaymentByOrderIdAndStatusWithOrder(orderId, PaymentStatus.CREATED))
+                    .willReturn(Optional.empty());
+
+            // when
+            paymentService.processPaymentFailed(event);
+
+            // then
+            then(paymentRepository).should(never()).save(any(Payment.class));
+            then(orderRepository).should(never()).save(any(Order.class));
+        }
+    }
+
+
+    // helper
+    private Event mockStripeEventWithObject(StripeObject stripeObject) {
+        Event event = mock(Event.class);
+        EventDataObjectDeserializer deserializer = mock(EventDataObjectDeserializer.class);
+
+        given(event.getDataObjectDeserializer()).willReturn(deserializer);
+        given(deserializer.getObject()).willReturn(Optional.of(stripeObject));
+
+        return event;
     }
 }
