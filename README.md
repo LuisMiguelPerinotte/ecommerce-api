@@ -13,7 +13,6 @@
 ![Flyway](https://img.shields.io/badge/Flyway-Migrations-CC0200?logo=flyway&logoColor=white)
 
 
-&nbsp;&nbsp;&nbsp;
 ## ✨ Overview
 E-Commerce API is a RESTful backend application built with Java 21 and Spring Boot.
 
