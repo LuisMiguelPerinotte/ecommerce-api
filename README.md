@@ -359,20 +359,34 @@ docker-compose up --build
 
 &nbsp;&nbsp;&nbsp;
 ## 🧪 Testing
-The project includes automated tests focused on validating core business rules and service behavior.
 
-Current test coverage includes:
+The project includes automated tests focused on validating business rules, service behavior, persistence logic and error handling.
 
-- User registration flow
+Tests are written with **JUnit 5**, **Mockito**, **Spring Boot Test** and **H2 Database** for the test environment.
+
+### Test strategy
+
+| Test type | Focus |
+|---|---|
+| Unit tests | Validate service-layer business rules in isolation using mocks |
+| Integration tests | Validate repository behavior, entity mappings and database interactions |
+
+### Covered areas
+
+- Authentication and user registration
+- Email uniqueness validation
 - Password encryption
-- Automatic cart creation
-- Product management rules
-- Cart item manipulation
-- Stock validation
-- Exception scenarios
-- Repository behavior
+- Automatic cart creation after user registration
+- Product creation and update rules
+- Category validation
+- Cart item addition, update and removal
+- Stock validation before adding products to cart
+- Order creation from cart items
+- Payment status processing
+- Business exception scenarios
+- Repository queries and persistence behavior
 
-To run the tests:
+### Running tests
 
 ```bash
 ./mvnw test
