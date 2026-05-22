@@ -7,6 +7,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.auth.request.RegisterRequestDTO
 import com.java.luismiguel.ecommerce_api.api.dto.auth.response.AuthResponseDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.auth.response.UserResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.cart.Cart;
+import com.java.luismiguel.ecommerce_api.domain.cart.CartRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import com.java.luismiguel.ecommerce_api.domain.user.UserRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
@@ -57,6 +58,9 @@ class AuthServiceTest {
     @Mock
     private RefreshTokenService refreshTokenService;
 
+    @Mock
+    private CartRepository cartRepository;
+
     @InjectMocks
     private AuthService authService;
 
@@ -79,20 +83,29 @@ class AuthServiceTest {
             User savedUser = User.builder()
                     .userId(userId)
                     .username(requestDTO.username())
+                    .email(requestDTO.email())
                     .userRole(UserRole.ROLE_CUSTOMER)
+                    .active(true)
                     .createdAt(LocalDateTime.now())
                     .build();
 
             given(userRepository.existsByEmail(requestDTO.email())).willReturn(false);
-            given(userRepository.save(any(User.class))).willReturn(savedUser);
+            given(userRepository.saveAndFlush(any(User.class))).willReturn(savedUser);
+            given(cartRepository.saveAndFlush(any(Cart.class))).willAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            authService.registerNewUser(requestDTO);
+            UserResponseDTO result = authService.registerNewUser(requestDTO);
 
             // then
+            assertThat(result.userId()).isEqualTo(userId);
+            assertThat(result.username()).isEqualTo("Username");
+            assertThat(result.email()).isEqualTo("email@email.com");
+            assertThat(result.userRole()).isEqualTo(UserRole.ROLE_CUSTOMER);
+            assertThat(result.createdAt()).isNotNull();
+
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
-            then(userRepository).should().save(userCaptor.capture());
+            then(userRepository).should().saveAndFlush(userCaptor.capture());
 
             User userToSave = userCaptor.getValue();
 
@@ -100,9 +113,54 @@ class AuthServiceTest {
             assertThat(userToSave.getUsername()).isEqualTo("Username");
             assertThat(userToSave.getUserRole()).isEqualTo(UserRole.ROLE_CUSTOMER);
             assertThat(userToSave.getActive()).isTrue();
-            assertThat(userToSave.getCart()).isNotNull();
-            assertThat(userToSave.getCart().getUser()).isSameAs(userToSave);
+
+            ArgumentCaptor<Cart> cartCaptor = ArgumentCaptor.forClass(Cart.class);
+
+            then(cartRepository).should().saveAndFlush(cartCaptor.capture());
+
+            Cart cartToSave = cartCaptor.getValue();
+
+            assertThat(cartToSave.getUser()).isSameAs(savedUser);
         }
+
+
+        @Test
+        @DisplayName("Should Normalize Email And Username Successfully")
+        void shouldNormalizeEmailAndUsernameSuccessfully() {
+            // given
+            RegisterRequestDTO dirtyRequestDTO = new RegisterRequestDTO(
+                    "  Username  ",
+                    "  EMAIL@EMAIL.COM  ",
+                    "password123"
+            );
+
+            User savedUser = User.builder()
+                    .userId(userId)
+                    .username("Username")
+                    .email("email@email.com")
+                    .userRole(UserRole.ROLE_CUSTOMER)
+                    .active(true)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            given(userRepository.existsByEmail("email@email.com")).willReturn(false);
+            given(userRepository.saveAndFlush(any(User.class))).willReturn(savedUser);
+            given(cartRepository.saveAndFlush(any(Cart.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            // when
+            authService.registerNewUser(dirtyRequestDTO);
+
+            // then
+            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+
+            then(userRepository).should().saveAndFlush(userCaptor.capture());
+
+            User userToSave = userCaptor.getValue();
+
+            assertThat(userToSave.getUsername()).isEqualTo("Username");
+            assertThat(userToSave.getEmail()).isEqualTo("email@email.com");
+        }
+
 
 
         @Test
@@ -120,19 +178,22 @@ class AuthServiceTest {
 
             given(userRepository.existsByEmail(requestDTO.email())).willReturn(false);
             given(passwordEncoder.encode(requestDTO.password())).willReturn("encoded-password");
-            given(userRepository.save(any(User.class))).willReturn(savedUser);
+            given(userRepository.saveAndFlush(any(User.class))).willReturn(savedUser);
+            given(cartRepository.saveAndFlush(any(Cart.class))).willAnswer(invocation -> invocation.getArgument(0));
 
             // when
             authService.registerNewUser(requestDTO);
 
             // then
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-            then(userRepository).should().save(userCaptor.capture());
+
+            then(userRepository).should().saveAndFlush(userCaptor.capture());
 
             User userToSave = userCaptor.getValue();
 
             assertThat(userToSave.getPassword()).isEqualTo("encoded-password");
             assertThat(userToSave.getPassword()).isNotEqualTo("password123");
+
             then(passwordEncoder).should().encode("password123");
         }
 
@@ -151,20 +212,23 @@ class AuthServiceTest {
                     .build();
 
             given(userRepository.existsByEmail(requestDTO.email())).willReturn(false);
-            given(userRepository.save(any(User.class))).willReturn(savedUser);
+            given(userRepository.saveAndFlush(any(User.class))).willReturn(savedUser);
+            given(cartRepository.saveAndFlush(any(Cart.class))).willAnswer(invocation -> invocation.getArgument(0));
 
             // when
             authService.registerNewUser(requestDTO);
 
             // then
-            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-            then(userRepository).should().save(userCaptor.capture());
+            ArgumentCaptor<Cart> cartCaptor = ArgumentCaptor.forClass(Cart.class);
 
-            User userToSave = userCaptor.getValue();
+            then(cartRepository).should().saveAndFlush(cartCaptor.capture());
 
-            assertThat(userToSave.getCart()).isNotNull();
-            assertThat(userToSave.getCart().getUser()).isSameAs(userToSave);
+            Cart cartToSave = cartCaptor.getValue();
+
+            assertThat(cartToSave).isNotNull();
+            assertThat(cartToSave.getUser()).isSameAs(savedUser);
         }
+
 
 
 
@@ -188,7 +252,7 @@ class AuthServiceTest {
         void shouldThrowExceptionWhenDataIntegrityViolation() {
             // given
             given(userRepository.existsByEmail("email@email.com")).willReturn(false);
-            given(userRepository.save(any(User.class)))
+            given(userRepository.saveAndFlush(any(User.class)))
                     .willThrow(new DataIntegrityViolationException(""));
 
             // when + then
