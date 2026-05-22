@@ -392,6 +392,10 @@ Tests are written with **JUnit 5**, **Mockito**, **Spring Boot Test** and **H2 D
 ./mvnw test
 ```
 
+### Continuous Integration
+
+The test suite is also executed automatically through GitHub Actions on each push or pull request.
+
 
 &nbsp;&nbsp;&nbsp;
 ## Contributing 🤝
