@@ -7,6 +7,7 @@ import com.java.luismiguel.ecommerce_api.api.dto.auth.request.RegisterRequestDTO
 import com.java.luismiguel.ecommerce_api.api.dto.auth.response.AuthResponseDTO;
 import com.java.luismiguel.ecommerce_api.api.dto.auth.response.UserResponseDTO;
 import com.java.luismiguel.ecommerce_api.domain.cart.Cart;
+import com.java.luismiguel.ecommerce_api.domain.cart.CartRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.User;
 import com.java.luismiguel.ecommerce_api.domain.user.UserRepository;
 import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
@@ -32,14 +33,16 @@ public class AuthService {
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
     private final RefreshTokenService refreshTokenService;
+    private final CartRepository cartRepository;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, JwtProperties jwtProperties, RefreshTokenService refreshTokenService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, JwtProperties jwtProperties, RefreshTokenService refreshTokenService, CartRepository cartRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.jwtProperties = jwtProperties;
         this.refreshTokenService = refreshTokenService;
+        this.cartRepository = cartRepository;
     }
 
     @Transactional
@@ -56,13 +59,15 @@ public class AuthService {
                 .active(Boolean.TRUE)
                 .build();
 
-        Cart userCart = Cart.builder()
-                .user(user)
-                .build();
-
         try {
-            user.setCart(userCart);
-            User savedUser = userRepository.save(user);
+            User savedUser = userRepository.saveAndFlush(user);
+
+            Cart userCart = Cart.builder()
+                    .user(savedUser)
+                    .build();
+
+            cartRepository.saveAndFlush(userCart);
+
             return new UserResponseDTO(
                     savedUser.getUserId(),
                     savedUser.getUsername(),
