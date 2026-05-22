@@ -1,6 +1,6 @@
 # 🛒 E-Commerce API
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml)
+[![CI - Java Spring Boot](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml/badge.svg)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml)
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
