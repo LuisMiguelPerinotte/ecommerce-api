@@ -20,8 +20,6 @@ It provides features for user authentication, product catalog management, shoppi
 
 The project was developed as a backend portfolio project, focusing on layered architecture, business rule validation, database migrations, external service integration, caching and automated tests.
 
-> **Project Status:** In development 🚧 — contributions, issues and pull requests are welcome.
-
 
 &nbsp;&nbsp;&nbsp;
 ## 💡 Motivation
