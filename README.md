@@ -39,17 +39,17 @@ The goal of this project is to simulate the backend of a real e-commerce applica
 
 &nbsp;&nbsp;&nbsp;
 ## 🚀 Features
-| Feature                          | Status     | Description                                        |
-|----------------------------------|------------|----------------------------------------------------|
+| Feature                          | Status     | Description                                         |
+|-----------------------------------|------------|----------------------------------------------------|
 | 👥 User registration/login       | Implemented | JWT-based authentication and authorization         |
 | 📦 Product management            | Implemented | CRUD for products and categories                   |
 | 🧺 Shopping cart                 | Implemented | Add/remove/update items, view cart                 |
 | 🧾 Order processing              | Implemented | Place orders, order history                        |
 | 💳 Payment integration           | Implemented | Stripe gateway integration                         |
 | 🏠 Address management            | Implemented | Manage shipping addresses                          |
-| 🛠️ Admin endpoints              |Implemented | Protected endpoints for managing catalog/users     |
+| 🛠️ Admin endpoints               | Implemented | Protected endpoints for managing catalog/users     |
 | 📚 API documentation (Swagger)   | Implemented | Interactive API docs with Springdoc/OpenAPI        |
-| ✅ Automated tests                | In Progress | Unit and integration tests for core business rules |
+| ✅ Automated tests               | Implemented | Unit and integration tests for core business rules |
 
 
 &nbsp;&nbsp;&nbsp;
