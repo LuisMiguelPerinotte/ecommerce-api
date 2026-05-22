@@ -32,4 +32,4 @@ jobs:
         run: chmod +x mvnw
 
       - name: Run tests
-        run: ./mvnw clean test
+        run: ./mvnw clean test -Dspring.profiles.active=test
