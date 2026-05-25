@@ -1,6 +1,6 @@
 # 🛒 E-Commerce API
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml)
+[![CI - Java Spring Boot](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml/badge.svg)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml)
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-green)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -20,8 +20,6 @@ It provides features for user authentication, product catalog management, shoppi
 
 The project was developed as a backend portfolio project, focusing on layered architecture, business rule validation, database migrations, external service integration, caching and automated tests.
 
-> **Project Status:** In development 🚧 — contributions, issues and pull requests are welcome.
-
 
 &nbsp;&nbsp;&nbsp;
 ## 💡 Motivation
@@ -39,17 +37,17 @@ The goal of this project is to simulate the backend of a real e-commerce applica
 
 &nbsp;&nbsp;&nbsp;
 ## 🚀 Features
-| Feature                          | Status     | Description                                        |
-|----------------------------------|------------|----------------------------------------------------|
+| Feature                          | Status     | Description                                         |
+|-----------------------------------|------------|----------------------------------------------------|
 | 👥 User registration/login       | Implemented | JWT-based authentication and authorization         |
 | 📦 Product management            | Implemented | CRUD for products and categories                   |
 | 🧺 Shopping cart                 | Implemented | Add/remove/update items, view cart                 |
 | 🧾 Order processing              | Implemented | Place orders, order history                        |
 | 💳 Payment integration           | Implemented | Stripe gateway integration                         |
 | 🏠 Address management            | Implemented | Manage shipping addresses                          |
-| 🛠️ Admin endpoints              |Implemented | Protected endpoints for managing catalog/users     |
+| 🛠️ Admin endpoints               | Implemented | Protected endpoints for managing catalog/users     |
 | 📚 API documentation (Swagger)   | Implemented | Interactive API docs with Springdoc/OpenAPI        |
-| ✅ Automated tests                | In Progress | Unit and integration tests for core business rules |
+| ✅ Automated tests               | Implemented | Unit and integration tests for core business rules |
 
 
 &nbsp;&nbsp;&nbsp;
@@ -391,6 +389,10 @@ Tests are written with **JUnit 5**, **Mockito**, **Spring Boot Test** and **H2 D
 ```bash
 ./mvnw test
 ```
+
+### Continuous Integration
+
+The test suite is also executed automatically through GitHub Actions on each push or pull request.
 
 
 &nbsp;&nbsp;&nbsp;
