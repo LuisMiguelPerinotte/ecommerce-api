@@ -7,7 +7,7 @@ import java.util.UUID;
 public record CreateOrderRequestDTO(
         UUID addressId,
 
-        @Size(max = 200)
+        @Size(max = 200, message = "The User Notes cannot be longer than 200 characters!")
         String userNotes // Opcional
 ) {
 }

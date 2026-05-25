@@ -4,7 +4,7 @@ import com.java.luismiguel.ecommerce_api.domain.user.enums.UserRole;
 import jakarta.validation.constraints.NotNull;
 
 public record ChangeUserRoleRequestDTO(
-        @NotNull
+        @NotNull(message = "The Role is required!")
         UserRole role
 ) {
 }

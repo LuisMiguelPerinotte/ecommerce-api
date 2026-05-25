@@ -9,7 +9,7 @@ public record ChangePasswordRequestDTO(
         String currentPassword,
 
         @NotBlank(message = "New Password is required!")
-        @Size(min = 8)
+        @Size(min = 8, message = "The New Password must be at least 8 characters long!")
         @Pattern(
                 regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
                 message = "regexp = \"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[@$!%*?&])[A-Za-z\\\\d@$!%*?&]+$\""

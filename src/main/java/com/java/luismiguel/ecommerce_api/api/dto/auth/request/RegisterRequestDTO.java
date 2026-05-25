@@ -15,8 +15,8 @@ public record RegisterRequestDTO(
         String username,
 
         @NotBlank (message = "The E-mail is required!")
-        @Size(max = 150)
-        @Email
+        @Size(max = 150, message = "The E-mail cannot be longer than 150 characters!")
+        @Email(message = "The E-mail must be valid!")
         String email,
 
         @NotBlank (message = "The Password is required!")

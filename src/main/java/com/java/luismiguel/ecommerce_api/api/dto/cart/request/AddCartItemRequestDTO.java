@@ -6,11 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record AddCartItemRequestDTO(
-        @NotNull
+        @NotNull(message = "The Product Id is required!")
         UUID productId,
 
-        @NotNull
-        @Min(0)
+        @NotNull(message = "The Quantity is required!")
+        @Min(value = 0, message = "The Quantity cannot be negative!")
         Integer quantity
 ) {
 }

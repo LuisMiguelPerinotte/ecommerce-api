@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record AdjustProductStockRequestDTO(
         @NotNull(message = "The quantity is required!")
-        @Min(0)
+        @Min(value = 0, message = "The quantity cannot be negative!")
         Integer quantity
 ) {
 }
