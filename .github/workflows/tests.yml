@@ -1,4 +1,4 @@
-name: CI - Java Spring Boot
+name: CI - E-Commerce API
 
 on:
   push:
