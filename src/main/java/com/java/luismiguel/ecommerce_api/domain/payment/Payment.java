@@ -20,38 +20,38 @@ import java.util.UUID;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID paymentId;
+    private UUID paymentId;
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    Order order;
+    private Order order;
 
     @Column(name = "stripe_session_id", unique = true)
-    String stripeSessionId;
+    private String stripeSessionId;
 
     @Column(name = "payment_intent_id", unique = true)
-    String paymentIntentId;
+    private String paymentIntentId;
 
     @Column(name = "amount", nullable = false)
-    BigDecimal amount;
+    private BigDecimal amount;
 
     @Column(name = "currency")
-    String currency;
+    private String currency;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)
-    PaymentStatus status;
+    private PaymentStatus status;
 
     @Column(name = "failure_reason")
-    String failureReason;
+    private String failureReason;
 
     @Column(name = "paid_at")
-    LocalDateTime paidAt;
+    private LocalDateTime paidAt;
 
     @Column(name = "failed_at")
-    LocalDateTime failedAt;
+    private LocalDateTime failedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 }

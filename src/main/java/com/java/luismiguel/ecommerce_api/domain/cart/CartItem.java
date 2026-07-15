@@ -17,22 +17,22 @@ import java.util.UUID;
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID cartItemId;
+    private UUID cartItemId;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")
-    Cart cart;
+    private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    Product product;
+    private Product product;
 
     @Column(name = "quantity", nullable = false)
-    Integer quantity;
+    private Integer quantity;
 
     @Column(name = "unit_price", nullable = false)
-    BigDecimal unitPrice;
+    private BigDecimal unitPrice;
 
     @Column(name = "subtotal", nullable = false)
-    BigDecimal subtotal;
+    private BigDecimal subtotal;
 }

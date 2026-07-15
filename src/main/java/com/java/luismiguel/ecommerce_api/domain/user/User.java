@@ -26,34 +26,34 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id")
-    UUID userId;
+    private UUID userId;
 
     @Column(name = "username", nullable = false)
-    String username;
+    private String username;
 
     @Column(name = "email", nullable = false, unique = true)
-    String email;
+    private String email;
 
     @Column(name = "password", nullable = false)
-    String password;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", length = 50, nullable = false)
-    UserRole userRole;
+    private UserRole userRole;
 
     @Column(nullable = false)
-    Boolean active = Boolean.TRUE;
+    private Boolean active = Boolean.TRUE;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
 
     @Override

@@ -20,21 +20,21 @@ import java.util.UUID;
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID cartId;
+    private UUID cartId;
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cart_id")
-    List<CartItem> items;
+    private List<CartItem> items;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 }

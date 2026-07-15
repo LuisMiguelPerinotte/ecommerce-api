@@ -20,38 +20,38 @@ import java.util.UUID;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID productId;
+    private UUID productId;
 
     @Column(name = "name", nullable = false, length = 200)
-    String name;
+    private String name;
 
     @Column(name = "description", nullable = false, length = 2000)
-    String description;
+    private String description;
 
     @Column(name = "price", nullable = false)
-    BigDecimal price;
+    private BigDecimal price;
 
     @Column(name = "stock_quantity", nullable = false)
-    Integer stockQuantity;
+    private Integer stockQuantity;
 
     @Column(name = "image_url")
-    String imageUrl; // Nesse momento é opcional. Mais para frente adicionar S3 para armazenar imagens
+    private String imageUrl; // Nesse momento é opcional. Mais para frente adicionar S3 para armazenar imagens
 
     @Column(name = "sku")
-    String sku; // Nesse momento é opcional
+    private String sku; // Nesse momento é opcional
 
     @Column(name = "active", nullable = false)
-    Boolean active;
+    private Boolean active;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    Category category;
+    private Category category;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 }

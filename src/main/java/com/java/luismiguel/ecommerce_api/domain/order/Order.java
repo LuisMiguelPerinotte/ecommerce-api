@@ -23,35 +23,35 @@ import java.util.UUID;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID orderId;
+    private UUID orderId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    User user;
+    private User user;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
-    List<OrderItem> items;
+    private List<OrderItem> items;
 
     @ManyToOne
     @JoinColumn(name = "shipping_address_id")
-    Address shippingAddress;
+    private Address shippingAddress;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", length = 50, nullable = false)
-    OrderStatus orderStatus;
+    private OrderStatus orderStatus;
 
     @Column(name = "total_amount", nullable = false)
-    BigDecimal totalAmount;
+    private BigDecimal totalAmount;
 
     @Column(name = "user_notes")
-    String userNotes;
+    private String userNotes;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 }

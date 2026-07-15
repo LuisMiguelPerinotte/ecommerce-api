@@ -17,21 +17,21 @@ import java.util.UUID;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID categoryId;
+    private UUID categoryId;
 
     @Column(name = "name", unique = true, nullable = false, length = 100)
-    String name;
+    private String name;
 
     @Column(name = "description", length = 500) //Opcional
-    String description;
+    private String description;
 
     @Column(name = "slug", nullable = false)
-    String slug;
+    private String slug;
 
     @Column(name = "active", nullable = false)
-    Boolean active;
+    private Boolean active;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 }

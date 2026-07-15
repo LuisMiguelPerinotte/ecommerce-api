@@ -17,36 +17,36 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "address_id")
-    UUID addressId;
+    private UUID addressId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    User user;
+    private User user;
 
     @Column(name = "street", nullable = false)
-    String street;
+    private String street;
 
     @Column(name = "house_number", nullable = false)
-    String houseNumber;
+    private String houseNumber;
 
     @Column(name = "complement")
-    String complement;
+    private String complement;
 
     @Column(name = "neighborhood", nullable = false)
-    String neighborhood;
+    private String neighborhood;
 
     @Column(name = "city", nullable = false)
-    String city;
+    private String city;
 
     @Column(name = "state", nullable = false, length = 2)
-    String state;
+    private String state;
 
     @Column(name = "zip_code", nullable = false)
-    String zipCode;
+    private String zipCode;
 
     @Column(name = "is_default", nullable = false)
-    Boolean isDefault;
+    private Boolean isDefault;
 
     @Column(name = "active", nullable = false)
-    Boolean active;
+    private Boolean active;
 }
