@@ -1,8 +1,8 @@
 # 🛒 E-Commerce API
 
-[![CI - Java Spring Boot](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml/badge.svg)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml)
-![Java](https://img.shields.io/badge/Java-21-blue)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-green)
+[![CI - E-Commerce API](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml/badge.svg)](https://github.com/LuisMiguelPerinotte/ecommerce-api/actions/workflows/tests.yml)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen?style=flat&logo=springboot&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192?logo=postgresql&logoColor=white)
